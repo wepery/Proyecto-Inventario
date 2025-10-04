@@ -1,47 +1,24 @@
 <body>
-  <div class="container">
-    <h1><i class="fas fa-reply"></i> Responder Reclamo</h1>
-    <hr>
+<div class="container" *ngIf="reclamo">
+  <h1><i class="fas fa-reply"></i> Responder Reclamo</h1>
+  <hr>
 
-    <div class="form-single-column">
+  <table class="table text-center table-bordered">
+    <tr><td colspan="2" class="table-header">Detalle de Reclamo</td></tr>
+    <tr><td>Código</td><td>{{ reclamo.reclamoId }}</td></tr>
+    <tr><td>Nombre</td><td style="text-transform: capitalize">{{ reclamo.usuario.nombre }}</td></tr>
+    <tr><td>Correo</td><td>{{ reclamo.usuario.email }}</td></tr>
+    <tr><td>Asunto</td><td>{{ reclamo.asunto }}</td></tr>
+  </table>
 
-      <table class="table text-center table-bordered">
-        <tr>
-          <td colspan="2" class="table-header">Detalle de Reclamo</td>
-        </tr>
-        <tr>
-          <td>Código</td>
-          <td>{{ reclamo.reclamoId }}</td>
-        </tr>
-        <tr>
-          <td>Nombre</td>
-          <td style="text-transform: capitalize">{{ reclamo.usuario.nombre }}</td>
-        </tr>
-        <tr>
-          <td>Correo</td>
-          <td>{{ reclamo.usuario.email }}</td>
-        </tr>
-        <tr>
-          <td>Asunto</td>
-          <td>{{ reclamo.asunto }}</td>
-        </tr>
-      </table>
+  <mat-form-field appearance="outline" class="w100">
+    <mat-label>Mensaje</mat-label>
+    <textarea matInput [(ngModel)]="mensaje" placeholder="Ingrese el mensaje de disculpas" rows="9"></textarea>
+  </mat-form-field>
 
-      <div class="form-column">
-        <h2>Mensaje a enviar al correo</h2>
-        <hr>
-        <mat-form-field appearance="outline" class="w100">
-          <mat-label>Mensaje</mat-label>
-          <textarea matInput [(ngModel)]="mensaje" placeholder="Ingrese el mensaje de disculpas" rows="9"></textarea>
-        </mat-form-field>
-      </div>
+  <button type="button" class="btn-action" (click)="enviarDisculpas()">
+    <i class="fas fa-paper-plane"></i> Enviar Disculpas
+  </button>
+</div>
 
-      <div class="form-column">
-        <button type="button" class="btn-action" (click)="enviarDisculpas()">
-          <i class="fas fa-paper-plane"></i> Enviar Disculpas
-        </button>
-      </div>
-
-    </div>
-  </div>
 </body>

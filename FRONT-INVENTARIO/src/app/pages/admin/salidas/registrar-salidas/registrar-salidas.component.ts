@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { DetalleSalida } from 'src/app/core/models/detalle-salidad';
 import { LoginService } from 'src/app/core/services/login.service';
 import { ProductoService } from 'src/app/core/services/producto.service';
 import { SalidaService } from 'src/app/core/services/salida.service';
-import swal from 'sweetalert2';
+import Swal from 'sweetalert2';
+
 @Component({
   selector: 'app-registrar-salidas',
   templateUrl: './registrar-salidas.component.html',
@@ -12,140 +14,84 @@ import swal from 'sweetalert2';
 })
 export class RegistrarSalidasComponent implements OnInit {
 
-  formulario!: UntypedFormGroup;
-  fechaSalida: string="";
- listaDetalleSalida:any[]=[];
+  salidaForm!: FormGroup;
   producto: any[] = [];
+  listaDetalleSalida: any[] = [];
   isLoggedIn = false;
-  user:any = null;
-  detalleSalida: any = {
-
-    descripcion: '',
-    cantidad: '',
-
-    producto: {
-      productoId: '',
-    },
-    usuario: {
-      id: '',
-    },
-    salida: {
-    fechaSalida: '',
-    },
-  };
-
-
-
+  user: any = null;
 
   constructor(
-    private productoService:ProductoService,
-    private login:LoginService,
-    private salidaService:SalidaService, 
+    private fb: FormBuilder,
+    private productoService: ProductoService,
+    private login: LoginService,
+    private salidaService: SalidaService,
     private router: Router
   ) { }
 
   ngOnInit(): void {
+    this.salidaForm = this.fb.group({
+      productoId: ['', Validators.required],
+      descripcion: ['', Validators.required],
+      cantidad: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
+      fechaSalida: ['', Validators.required]
+    });
+
     this.obtenerProducto();
     this.obtenerUsuario();
+  }
 
+  obtenerProducto() {
+    this.productoService.listarProductoActivadas().subscribe({
+      next: (data: any) => this.producto = data,
+      error: (err) => console.error(err)
+    });
+  }
+
+  obtenerUsuario() {
+    this.isLoggedIn = this.login.isLoggedIn();
+    this.user = this.login.getUser();
+    this.login.loginStatusSubjec.asObservable().subscribe(() => {
+      this.isLoggedIn = this.login.isLoggedIn();
+      this.user = this.login.getUser();
+    });
+  }
+
+  agregarProducto() {
+    if (this.salidaForm.invalid) {
+      Swal.fire('Error', 'Complete todos los campos antes de agregar.', 'error');
+      return;
+    }
+
+    const detalle: DetalleSalida = {
+      producto: { productoId: this.salidaForm.value.productoId },
+      descripcion: this.salidaForm.value.descripcion,
+      cantidad: this.salidaForm.value.cantidad,
+      salida: { fechaSalida: this.salidaForm.value.fechaSalida },
+      usuario: { id: this.user.id }
+    };
+
+    this.listaDetalleSalida.push(detalle);
+    this.salidaForm.reset();
   }
 
   enviarSalida() {
-    console.log(this.detalleSalida);
-  
-    //Verifica que los campos estén completos
-    if (this.listaDetalleSalida.length>0) {
-      // Asegúrate de que this.fechaEntrada tenga un valor definido antes de usarlo
-  
-      // Itera sobre cada elemento del arreglo
-      this.listaDetalleSalida.forEach((detalleSalida: any) => {
-        detalleSalida.usuario.id = this.user.id ;
-      });
-  
-      // Llama a tu función para enviar la salida al servidor
-      this.salidaService.crearEntradaConDetalles(this.listaDetalleSalida)
-        .subscribe((response) => {
-          console.log('Respuesta del servidor:', response);
-          this.listaDetalleSalida=[];
-          this.limpiar();
-
-          swal.fire({
-            icon: 'success',
-            title: 'Éxito',
-            text: 'La salida se ha enviado correctamente',
-          });
-          this.router.navigate(['/admin/salidas']);
-
-          // Puedes manejar la respuesta del servidor aquí (por ejemplo, mostrar un mensaje de éxito al usuario)
-        }, (error) => {
-          console.error('Error al hacer la solicitud:', error);
-          swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Hubo un problema al enviar la salida. Por favor, inténtalo de nuevo.',
-          });
-        });
-    } else {
-      // Maneja el caso en el que los campos no estén completos
-      console.error('Campos incompletos');
-      // Puedes mostrar un mensaje de error al usuario o realizar otras acciones aquí
-      swal.fire({
-        icon: 'error',
-        title: 'Campos incompletos',
-        text: 'Por favor, completa todos los campos antes de enviar la salida.',
-      });
-    
+    if (this.listaDetalleSalida.length === 0) {
+      Swal.fire('Error', 'Agregue al menos un registro antes de enviar.', 'error');
+      return;
     }
-  }
 
-
-
-
-
-
-
-  obtenerProducto() {
-    this.productoService.listarProductoActivadas().subscribe(
-      (producto: any) => {
-        this.producto = producto;
+    this.salidaService.crearEntradaConDetalles(this.listaDetalleSalida).subscribe({
+      next: () => {
+        Swal.fire('Éxito', 'La salida se ha enviado correctamente', 'success');
+        this.listaDetalleSalida = [];
+        this.salidaForm.reset();
+        this.router.navigate(['/admin/salidas']);
       },
-      (error: any) => {
-        console.log("Error al obtener las categorías: ", error);
+      error: (err) => {
+        console.error(err);
+        Swal.fire('Error', 'Hubo un problema al enviar la salida', 'error');
       }
-    );
-  }
-  obtenerUsuario(){
-    this.isLoggedIn = this.login.isLoggedIn();
-    this.user = this.login.getUser();
-    this.login.loginStatusSubjec.asObservable().subscribe(
-      data => {
-        this.isLoggedIn = this.login.isLoggedIn();
-        this.user = this.login.getUser();
-      }
-    )
+    });
   }
 
-  agregarProducto(){
-    this.listaDetalleSalida.push({...this.detalleSalida});
-    
-    this.limpiar();
-
-
-  }
-  limpiar(){
-    this.detalleSalida={
-     descripcion: '',
-      cantidad: '',
-  
-      producto: {
-        productoId: '',
-      },
-      usuario: {
-        id: '',
-      },
-      salida: {
-        fechaSalida: '',
-      },
-  }
-}
 }

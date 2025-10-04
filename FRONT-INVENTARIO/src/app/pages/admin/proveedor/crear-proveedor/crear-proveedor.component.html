@@ -2,20 +2,18 @@
   <div class="container">
     <h1><i class="fas fa-truck"></i> Agregar Nuevo Proveedor</h1>
     <hr>
-    <form class="form-grid" (submit)="crearProveedor()" enctype="multipart/form-data">
+    <form [formGroup]="proveedorForm" class="form-grid" (ngSubmit)="crearProveedor()">
       <div class="form-row">
         <div class="form-column">
           <mat-form-field appearance="outline">
             <mat-label><i class="fas fa-store"></i> Nombre Proveedor</mat-label>
-            <input required autofocus type="text" name="nombre" matInput
-                   placeholder="Digite el nombre del proveedor" [(ngModel)]="nombre">
+            <input matInput placeholder="Digite el nombre del proveedor" formControlName="nombre">
           </mat-form-field>
         </div>
         <div class="form-column">
           <mat-form-field appearance="outline">
             <mat-label><i class="fas fa-envelope"></i> Email Proveedor</mat-label>
-            <input required autofocus type="email" name="email" matInput
-                   placeholder="Digite el email del proveedor" [(ngModel)]="Email">
+            <input matInput placeholder="Digite el email del proveedor" formControlName="email">
           </mat-form-field>
         </div>
       </div>
@@ -23,16 +21,14 @@
         <div class="form-column">
           <mat-form-field appearance="outline">
             <mat-label><i class="fas fa-phone"></i> Teléfono Proveedor</mat-label>
-            <input required autofocus type="number" name="telefono" matInput
-                   placeholder="Digite el teléfono del proveedor" [(ngModel)]="Telefono"
-                   (input)="limitarLongitud1($event); validarNumeroPositivo($event)">
+            <input matInput placeholder="Digite el teléfono del proveedor" formControlName="telefono"
+              (input)="limitarLongitud($event, 9); validarNumeroPositivo($event)">
           </mat-form-field>
         </div>
         <div class="form-column">
           <mat-form-field appearance="outline">
             <mat-label><i class="fas fa-map-marker-alt"></i> Dirección Proveedor</mat-label>
-            <input required autofocus type="text" name="direccion" matInput
-                   placeholder="Digite la dirección del proveedor" [(ngModel)]="Direccion">
+            <input matInput placeholder="Digite la dirección del proveedor" formControlName="direccion">
           </mat-form-field>
         </div>
       </div>
@@ -40,9 +36,8 @@
         <div class="form-column">
           <mat-form-field appearance="outline">
             <mat-label><i class="fas fa-id-card"></i> RUC Proveedor</mat-label>
-            <input required autofocus type="number" name="ruc" matInput
-                   placeholder="Digite el RUC del proveedor" [(ngModel)]="Ruc"
-                   (input)="limitarLongitud2($event); validarNumeroPositivo($event)">
+            <input matInput placeholder="Digite el RUC del proveedor" formControlName="ruc"
+              (input)="limitarLongitud($event, 11); validarNumeroPositivo($event)">
           </mat-form-field>
         </div>
         <div class="form-column">

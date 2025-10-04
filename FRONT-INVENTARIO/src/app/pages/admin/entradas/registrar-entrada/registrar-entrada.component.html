@@ -2,62 +2,30 @@
   <div class="container">
     <h1><i class="fas fa-sign-in-alt"></i> Registro de Entrada de Producto</h1>
     <hr />
-    <form class="form-grid" (submit)="enviarEntrada()">
+    <form class="form-grid"[formGroup]="detalleEntradaForm" (submit)="enviarEntrada()">
       <mat-form-field appearance="outline" *ngIf="isLoggedIn && user">
         <mat-label><i class="fas fa-user"></i> Usuario</mat-label>
-        <input
-          matInput
-          required
-          name="Usuario"
-          disabled="true"
-          [value]="user.username"
-        />
+        <input matInput required [value]="user.username" name="Usuario" disabled="true" [value]="user.username" />
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label><i class="fas fa-box"></i> Producto</mat-label>
-        <mat-select
-          required
-          name="productoId"
-          [(ngModel)]="detalleEntrada.producto.productoId"
-        >
-          <mat-option
-            *ngFor="let producto of producto"
-            [value]="producto.productoId"
-            >{{ producto.nombre }}</mat-option
-          >
+        <mat-select required name="productoId" formControlName="productoId"
+          [(ngModel)]="detalleEntrada.producto.productoId">
+          <mat-option *ngFor="let producto of producto" [value]="producto.productoId">{{ producto.nombre }}</mat-option>
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label><i class="fas fa-file-alt"></i> Descripción</mat-label>
-        <input
-          matInput
-          required
-          name="descripcion"
-          [(ngModel)]="detalleEntrada.descripcion"
-        />
+        <input matInput required name="descripcion" formControlName="descripcion" />
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label><i class="fas fa-sort-numeric-up"></i> Cantidad</mat-label>
-        <input
-          matInput
-          type="number"
-          required
-          name="cantidad"
-          [(ngModel)]="detalleEntrada.cantidad"
-          (input)="guardarValor($event)"
-        />
+        <input matInput type="number" required name="cantidad" formControlName="cantidad"
+          (input)="guardarValor($event)" />
       </mat-form-field>
       <mat-form-field appearance="outline" style="grid-column: span 2">
-        <mat-label
-          ><i class="fas fa-calendar-alt"></i> Fecha de Entrada</mat-label
-        >
-        <input
-          matInput
-          required
-          name="fechaEntrada"
-          type="date"
-          [(ngModel)]="detalleEntrada.entrada.fechaEntrada"
-        />
+        <mat-label><i class="fas fa-calendar-alt"></i> Fecha de Entrada</mat-label>
+        <input matInput required name="fechaEntrada" type="date" formControlName="fechaEntrada" />
       </mat-form-field>
       <div class="form-buttons">
         <button type="submit" class="btn-action">
@@ -82,7 +50,7 @@
             <td>{{ detalle.descripcion }}</td>
             <td>{{ detalle.cantidad }}</td>
           </tr>
-        
+
         </tbody>
       </table>
     </div>

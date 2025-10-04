@@ -1,22 +1,23 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import Swal from 'sweetalert2';
 import { ProductoService } from 'src/app/core/services/producto.service';
 import { ProveedorService } from 'src/app/core/services/proveedor.service';
-import Swal from 'sweetalert2';
+
 @Component({
   selector: 'app-actualizar-producto',
   templateUrl: './actualizar-producto.component.html',
   styleUrls: ['./actualizar-producto.component.css']
 })
 export class ActualizarProductoComponent implements OnInit {
-  producto: any;
-  productoId: any = 0;
+
+  productoForm!: FormGroup;
+  productoId: number = 0;
   proveedores: any[] = [];
-  proveedorId: any = 0;
 
   constructor(
+    private fb: FormBuilder,
     private route: ActivatedRoute,
     private productoService: ProductoService,
     private proveedorService: ProveedorService,
@@ -26,89 +27,71 @@ export class ActualizarProductoComponent implements OnInit {
   ngOnInit(): void {
     this.productoId = this.route.snapshot.params['productoId'];
 
-    // Obtén el producto y los proveedores
-    this.productoService.obtenerProductoPorId(this.productoId).subscribe(
-      (data) => {
-        this.producto = data;
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
+    this.productoForm = this.fb.group({
+      nombre: ['', Validators.required],
+      descripcion: ['', Validators.required],
+      precio: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
+      stock: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
+      ubicacion: ['', Validators.required],
+      proveedorId: ['', Validators.required]
+    });
 
-    this.proveedorService.listarProveedorActivadas().subscribe(
-      (data: any) => {
-        this.proveedores = data; // Asigna los datos al arreglo proveedores
-        console.log(this.proveedores); // Verifica si los datos se han asignado correctamente
+    // Cargar proveedores
+    this.proveedorService.listarProveedorActivadas().subscribe({
+      next: (data: any) => this.proveedores = data,
+      error: (error) => console.error(error)
+    });
+
+    // Cargar producto
+    this.productoService.obtenerProductoPorId(this.productoId).subscribe({
+      next: (data: any) => {
+        this.productoForm.patchValue({
+          nombre: data.nombre,
+          descripcion: data.descripcion,
+          precio: data.precio,
+          stock: data.stock,
+          ubicacion: data.ubicacion,
+          proveedorId: data.proveedor.proveedorId
+        });
       },
-      (error) => {
-        console.log(error);
-      }
-    );
+      error: (error) => console.error(error)
+    });
   }
-
-
-
-
 
   actualizarProducto(): void {
-    // Verificar si el proveedorId y proveedor son válidos
-    if (!this.producto.nombre || !this.producto.precio || !this.producto.descripcion|| !this.producto.ubicacion|| !this.producto.stock|| !this.producto.proveedor ) {
-      // Mostrar un mensaje de error si falta alguno de los atributos
+    if (this.productoForm.invalid) {
       Swal.fire({
-          icon: 'error',
-          title: 'Faltan datos',
-          text: 'Por favor, ingrese todos los atributos antes de guardar el producto inventario.'
+        icon: 'error',
+        title: 'Faltan datos',
+        text: 'Por favor, complete todos los campos correctamente antes de actualizar.'
       });
-      return; // Detener la ejecución si falta algún atributo
-  }
+      return;
+    }
 
-
-    console.log('ProveedorId:', this.productoId);
-    console.log('Proveedor:', this.producto);
-
-    // Llamar al servicio para actualizar el proveedor
-    this.productoService.actualizarProducto(this.productoId, this.producto).subscribe(
-      (respuesta: any) => {
-        // El proveedor se actualizó correctamente
-        console.log('Proveedor actualizado:', respuesta);
-        Swal.fire({
-          icon: 'success',
-          title: 'Proveedor actualizado',
-          text: 'El proveedor se ha actualizado correctamente.'
-        }).then(() => {
-          // Redireccionar a la página de proveedores
-          this.router.navigate(['/admin/producto']);
-        });
-      },
-      (error: any) => {
-        // Error al actualizar el proveedor
-        console.error('Error al actualizar el proveedor:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al actualizar el proveedor',
-          text: 'Ocurrió un error al actualizar el proveedor. Por favor, inténtalo de nuevo.'
-        });
-      }
-    );
+    this.productoService.actualizarProducto(this.productoId, this.productoForm.value)
+      .subscribe({
+        next: () => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Producto actualizado',
+            text: 'El producto se ha actualizado correctamente.'
+          }).then(() => this.router.navigate(['/admin/producto']));
+        },
+        error: (error) => {
+          console.error(error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error al actualizar',
+            text: 'Ocurrió un error al actualizar el producto.'
+          });
+        }
+      });
   }
 
   validarNumeroPositivo(event: Event): void {
-    const inputElement = event.target as HTMLInputElement;
-    let inputValue = inputElement.value;
-
-    // Eliminar caracteres no numéricos, excepto el signo '-' si es el primer carácter
-    inputValue = inputValue.replace(/[^0-9-]/g, '');
-    // Si el valor comienza con "-", permitirlo, de lo contrario, eliminarlo
-    if (inputValue.charAt(0) === '-' && inputValue.length > 1) {
-      inputValue = '-' + inputValue.replace('-', '');
-    } else {
-      inputValue = inputValue.replace('-', '');
-    }
-    // Actualizar el valor del campo de entrada con los caracteres filtrados
-    inputElement.value = inputValue;
+    const input = event.target as HTMLInputElement;
+    let value = input.value.replace(/[^0-9]/g, '');
+    input.value = value;
   }
 
-
 }
-

@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { DetalleEntrada } from 'src/app/core/models/detalle-entrada';
 import { EntradaService } from 'src/app/core/services/entrada.service';
 import { LoginService } from 'src/app/core/services/login.service';
 import { ProductoService } from 'src/app/core/services/producto.service';
@@ -10,6 +12,8 @@ import swal from 'sweetalert2';
   styleUrls: ['./registrar-entrada.component.css']
 })
 export class RegistrarEntradaComponent implements OnInit {
+  detalleEntradaForm!: FormGroup;
+
   fechaEntrada: string = "";
   listaDetalleEntrada: any[] = [];
   producto: any[] = [];
@@ -33,6 +37,7 @@ export class RegistrarEntradaComponent implements OnInit {
   };
 
   constructor(
+    private fb: FormBuilder,
     private productoService: ProductoService,
     private login: LoginService,
     private entradaService: EntradaService,
@@ -40,56 +45,37 @@ export class RegistrarEntradaComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.detalleEntradaForm = this.fb.group({
+      productoId: ['', Validators.required],
+      descripcion: ['', Validators.required],
+      cantidad: [null, [Validators.required, Validators.min(1)]],
+      fechaEntrada: ['', Validators.required]
+    });
+
     this.obtenerProducto();
     this.obtenerUsuario();
-
   }
   enviarEntrada() {
-    console.log(this.detalleEntrada);
-
-
-
-
-
-
-    if (this.listaDetalleEntrada.length > 0) {
-      this.listaDetalleEntrada.forEach((detalleEntrada: any) => {
-        detalleEntrada.usuario.id = this.user.id;
-      });
-
-
-      this.entradaService.crearEntradaConDetalles(this.listaDetalleEntrada)
-        .subscribe((response) => {
-          console.log('Respuesta del servidor:', response);
-          this.listaDetalleEntrada = [];
-          this.limpiar();
-
-          swal.fire({
-            icon: 'success',
-            title: 'Éxito',
-            text: 'La entrada se ha enviado correctamente',
-          });
-          this.router.navigate(['/admin/entradas']);
-
-        }, (error) => {
-          console.error('Error al hacer la solicitud:', error);
-          swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Hubo un problema al enviar la entrada. Por favor, inténtalo de nuevo.',
-          });
-        });
-    } else {
-      // Maneja el caso en el que los campos no estén completos
-      console.error('Campos incompletos');
-      // Puedes mostrar un mensaje de error al usuario o realizar otras acciones aquí
-      swal.fire({
-        icon: 'error',
-        title: 'Campos incompletos',
-        text: 'Por favor, completa todos los campos antes de enviar la entrada.',
-      });
-
+    if (this.listaDetalleEntrada.length === 0) {
+      swal.fire('Error', 'Agregue al menos un registro antes de enviar.', 'error');
+      return;
     }
+
+    this.listaDetalleEntrada.forEach(d => d.usuario.id = this.user.id);
+
+    this.entradaService.crearEntradaConDetalles(this.listaDetalleEntrada)
+      .subscribe({
+        next: () => {
+          swal.fire('Éxito', 'La entrada se ha enviado correctamente.', 'success');
+          this.listaDetalleEntrada = [];
+          this.detalleEntradaForm.reset();
+          this.router.navigate(['/admin/entradas']);
+        },
+        error: err => {
+          console.error(err);
+          swal.fire('Error', 'Hubo un problema al enviar la entrada.', 'error');
+        }
+      });
   }
 
 
@@ -116,41 +102,34 @@ export class RegistrarEntradaComponent implements OnInit {
   }
 
   agregarProducto() {
-    this.listaDetalleEntrada.push({ ...this.detalleEntrada });
-    this.limpiar();
-  }
-  limpiar() {
-    this.detalleEntrada = {
-      descripcion: '',
-      cantidad: null,
+    if (this.detalleEntradaForm.invalid) return;
 
-      producto: {
-        productoId: '',
-      },
-      usuario: {
-        id: '',
-      },
-      entrada: {
-        fechaEntrada: '',
-      },
-    }
-
+    const detalle: DetalleEntrada = {
+      descripcion: this.detalleEntradaForm.value.descripcion,
+      cantidad: this.detalleEntradaForm.value.cantidad,
+      producto: { productoId: this.detalleEntradaForm.value.productoId },
+      usuario: { id: this.user.id },
+      entrada: { fechaEntrada: this.detalleEntradaForm.value.fechaEntrada }
+    };
+    this.listaDetalleEntrada.push(detalle);
+    this.detalleEntradaForm.reset();
   }
- 
+
+
   guardarValor(event: any) {
     const inputElement = event.target as HTMLInputElement;
     let inputValue = inputElement.value;
 
     inputValue = inputValue.replace(/[^0-9-]/g, '');
     if (inputValue.charAt(0) === '-' && inputValue.length > 1) {
-        inputValue = '-' + inputValue.replace('-', '');
+      inputValue = '-' + inputValue.replace('-', '');
     } else {
-        inputValue = inputValue.replace('-', '');
+      inputValue = inputValue.replace('-', '');
     }
     inputElement.value = inputValue;
   }
-  
-  
-  
-  
+
+
+
+
 }

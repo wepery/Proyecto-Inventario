@@ -35,15 +35,15 @@ export class UsuarioService {
   public desactivarUsuario1(usuarioRolId: any): Observable<any> {
     return this.http.post(`${baserUrl}/usuarios/desactivar/${usuarioRolId}`, {});
   }
-desactivarUsuario(usuarioRolId: any): Observable<string> {
-  const url = `${baserUrl}/usuarios/desactivar/${usuarioRolId}`;
-  return this.http.put(url, null, { responseType: 'text' });
-}
+  desactivarUsuario(usuarioRolId: any): Observable<string> {
+    const url = `${baserUrl}/usuarios/desactivar/${usuarioRolId}`;
+    return this.http.put(url, null, { responseType: 'text' });
+  }
 
-activarUsuario(usuarioRolId: any): Observable<string> {
-  const url = `${baserUrl}/usuarios/activar/${usuarioRolId}`;
-  return this.http.put(url, null, { responseType: 'text' });
-}
+  activarUsuario(usuarioRolId: any): Observable<string> {
+    const url = `${baserUrl}/usuarios/activar/${usuarioRolId}`;
+    return this.http.put(url, null, { responseType: 'text' });
+  }
 
 
   obtenerUsuarioPorId(usuarioRolId: any): Observable<any> {
@@ -53,5 +53,10 @@ activarUsuario(usuarioRolId: any): Observable<string> {
     const url = `${baserUrl}/usuarios/${id}`;
     return this.http.put<any>(url, usuarioActualizado);
   }
-
+   añadirUsuario(user:any){
+      return this.http.post(`${baserUrl}/usuarios/guardar-admin`,user);
+    }
+   añadirNormal(user:any){
+      return this.http.post(`${baserUrl}/usuarios/guardar-normal`,user);
+    }
 }

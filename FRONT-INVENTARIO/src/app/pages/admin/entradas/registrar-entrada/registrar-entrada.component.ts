@@ -51,19 +51,13 @@ export class RegistrarEntradaComponent implements OnInit {
 
 
 
-    //Verifica que los campos estén completos
+
     if (this.listaDetalleEntrada.length > 0) {
-      // Asegúrate de que this.fechaEntrada tenga un valor definido antes de usarlo
-
-
-
-
-      // Itera sobre cada elemento del arreglo
       this.listaDetalleEntrada.forEach((detalleEntrada: any) => {
         detalleEntrada.usuario.id = this.user.id;
       });
 
-      // Llama a tu función para enviar la entrada al servidor
+
       this.entradaService.crearEntradaConDetalles(this.listaDetalleEntrada)
         .subscribe((response) => {
           console.log('Respuesta del servidor:', response);
@@ -77,7 +71,6 @@ export class RegistrarEntradaComponent implements OnInit {
           });
           this.router.navigate(['/admin/entradas']);
 
-          // Puedes manejar la respuesta del servidor aquí (por ejemplo, mostrar un mensaje de éxito al usuario)
         }, (error) => {
           console.error('Error al hacer la solicitud:', error);
           swal.fire({
@@ -148,15 +141,12 @@ export class RegistrarEntradaComponent implements OnInit {
     const inputElement = event.target as HTMLInputElement;
     let inputValue = inputElement.value;
 
-    // Eliminar caracteres no numéricos, excepto el signo '-' si es el primer carácter
     inputValue = inputValue.replace(/[^0-9-]/g, '');
-    // Si el valor comienza con "-", permitirlo, de lo contrario, eliminarlo
     if (inputValue.charAt(0) === '-' && inputValue.length > 1) {
         inputValue = '-' + inputValue.replace('-', '');
     } else {
         inputValue = inputValue.replace('-', '');
     }
-    // Actualizar el valor del campo de entrada con los caracteres filtrados
     inputElement.value = inputValue;
   }
   

@@ -3,58 +3,76 @@ import { UsuarioService } from 'src/app/core/services/usuario.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Usuario } from 'src/app/core/models/usuario';
 @Component({
   selector: 'app-registrar-usuario-administrador',
   templateUrl: './registrar-usuario-administrador.component.html',
   styleUrls: ['./registrar-usuario-administrador.component.css']
 })
 export class RegistrarUsuarioAdministradorComponent implements OnInit {
-
+  form!: FormGroup;
   constructor(
+    private fb: FormBuilder,
     private router: Router,
-    private userService: UsuarioService, private snack: MatSnackBar) { }
-  public user = {
-    username: '',
-    password: '',
-    nombre: '',
-    apellido: '',
-    email: '',
-    telefono: '',
-    dni:'',
-    direccion:'',
-    fechaNacimiento:'',
-    edad:''
-  }
+    private userService: UsuarioService,
+    private snack: MatSnackBar
+  ) { }
 
   ngOnInit(): void {
+    this.form = this.fb.group({
+      username: ['', Validators.required],
+      password: ['', Validators.required],
+      nombre: ['', Validators.required],
+      apellido: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      telefono: ['', [Validators.required, Validators.maxLength(8)]],
+      dni: ['', [Validators.required, Validators.maxLength(8)]],
+      direccion: ['', Validators.required],
+      fechaNacimiento: [''],
+      edad: ['']
+    });
   }
+
+
   formSubmit() {
-    console.log(this.user);
-    if (!this.user.username || !this.user.password || !this.user.nombre || !this.user.apellido || !this.user.email || !this.user.direccion || this.user.dni === null || this.user.telefono === null) {
-      // Mostrar un mensaje de error si falta alguno de los atributos
+    if (this.form.invalid) {
       Swal.fire({
-          icon: 'error',
-          title: 'Faltan datos',
-          text: 'Por favor, ingrese todos los atributos antes de guardar el usuario.'
+        icon: 'error',
+        title: 'Faltan datos',
+        text: 'Por favor, ingrese todos los campos requeridos correctamente.'
       });
-      return; // Detener la ejecución si falta algún atributo
-  }
+      return;
+    }
 
-    this.userService.añadirUsuarioAdmin(this.user).subscribe(
-      (data) => {
-        console.log(data);
-        Swal.fire('Usuario guardado', 'Usuario registrado con exito en el sistema', 'success');
+    const user: Usuario = {
+      username: 'O' + this.form.value.dni, // Generado automáticamente
+      password: this.form.value.dni + 'O', // Generado automáticamente
+      nombre: this.form.value.nombre,
+      apellido: this.form.value.apellido,
+      email: this.form.value.email,
+      telefono: this.form.value.telefono,
+      dni: this.form.value.dni,
+      direccion: this.form.value.direccion,
+      fechaNacimiento: this.form.value.fechaNacimiento,
+      edad: this.form.value.edad
+    };
+    this.userService.añadirUsuario(user).subscribe({
+      next: (data) => {
+        Swal.fire('Usuario guardado', 'Usuario registrado con éxito en el sistema', 'success');
         this.router.navigate(['/admin/usuario']);
-      }, (error) => {
-        console.log(error);
-        this.snack.open('Ha ocurrido un error en el sistema !!', 'Aceptar', {
-          duration: 3000
-        });
+      },
+      error: (err) => {
+        console.error(err);
+        this.snack.open('Ha ocurrido un error en el sistema', 'Aceptar', { duration: 3000 });
+      },
+      complete: () => {
+        console.log('Solicitud completada');
       }
-    )
-  }
+    });
 
-  limitarLongitud(event: any) {
+  }
+  limitarLongitud1(event: any) {
     const input = event.target;
     const maxLength = 8; // Máxima longitud permitida
 
@@ -62,9 +80,9 @@ export class RegistrarUsuarioAdministradorComponent implements OnInit {
       input.value = input.value.slice(0, maxLength); // Limita la longitud
     }
   }
-  limitarLongitud1(event: any) {
+  limitarLongitudTelefono(event: any) {
     const input = event.target;
-    const maxLength = 8; // Máxima longitud permitida
+    const maxLength = 9; // Máxima longitud permitida
 
     if (input.value.length > maxLength) {
       input.value = input.value.slice(0, maxLength); // Limita la longitud

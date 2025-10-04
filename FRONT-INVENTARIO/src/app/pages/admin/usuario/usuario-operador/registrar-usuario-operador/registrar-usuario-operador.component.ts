@@ -2,8 +2,11 @@ import Swal from 'sweetalert2';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { Component, OnInit } from '@angular/core';
-import { UserService } from 'src/app/core/services/user.service';
+
 import { Router } from '@angular/router';
+import { UsuarioService } from 'src/app/core/services/usuario.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Usuario } from 'src/app/core/models/usuario';
 
 @Component({
   selector: 'app-registrar-usuario-operador',
@@ -11,66 +14,66 @@ import { Router } from '@angular/router';
   styleUrls: ['./registrar-usuario-operador.component.css'],
 })
 export class RegistrarUsuarioOperadorComponent implements OnInit {
-  public user = {
-    username: '',
-    password: '',
-    nombre: '',
-    apellido: '',
-    email: '',
-    telefono: '',
-    dni: '',
-    direccion: '',
-    fechaNacimiento: '',
-    edad: '',
-  };
-
+  form!: FormGroup;
   constructor(
+    private fb: FormBuilder,
     private router: Router,
-    private userService: UserService,
+    private userService: UsuarioService,
     private snack: MatSnackBar
   ) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    this.form = this.fb.group({
+      username: ['', Validators.required],
+      password: ['', Validators.required],
+      nombre: ['', Validators.required],
+      apellido: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      telefono: ['', [Validators.required, Validators.maxLength(8)]],
+      dni: ['', [Validators.required, Validators.maxLength(8)]],
+      direccion: ['', Validators.required],
+      fechaNacimiento: [''],
+      edad: ['']
+    });
+  }
+
 
   formSubmit() {
-    console.log(this.user);
-    if (
-
-      !this.user.nombre ||
-      !this.user.apellido ||
-      !this.user.email ||
-      !this.user.direccion ||
-      this.user.dni === null ||
-      this.user.telefono === null
-    ) {
-      // Mostrar un mensaje de error si falta alguno de los atributos
+    if (this.form.invalid) {
       Swal.fire({
         icon: 'error',
         title: 'Faltan datos',
-        text: 'Por favor, ingrese todos los atributos antes de guardar el usuario.',
+        text: 'Por favor, ingrese todos los campos requeridos correctamente.'
       });
-      return; // Detener la ejecución si falta algún atributo
+      return;
     }
-    this.user.username = 'O' + this.user.dni;
-    this.user.password = this.user.dni + 'O';
-    console.log(this.user)
-    this.userService.añadirNormal(this.user).subscribe(
-      (data) => {
-        console.log(data);
-        Swal.fire(
-          'Usuario guardado',
-          'Usuario registrado con exito en el sistema',
-          'success'
-        );
+
+    const user: Usuario = {
+      username: 'O' + this.form.value.dni, // Generado automáticamente
+      password: this.form.value.dni + 'O', // Generado automáticamente
+      nombre: this.form.value.nombre,
+      apellido: this.form.value.apellido,
+      email: this.form.value.email,
+      telefono: this.form.value.telefono,
+      dni: this.form.value.dni,
+      direccion: this.form.value.direccion,
+      fechaNacimiento: this.form.value.fechaNacimiento,
+      edad: this.form.value.edad
+    };
+    this.userService.añadirNormal(user).subscribe({
+      next: (data) => {
+        Swal.fire('Usuario guardado', 'Usuario registrado con éxito en el sistema', 'success');
         this.router.navigate(['/admin/usuario']);
       },
-      (error) => {
-        console.log(error);
-        this.snack.open('Ha ocurrido un error en el sistema !!', 'Aceptar', {
-          duration: 3000,
-        });
+      error: (err) => {
+        console.error(err);
+        this.snack.open('Ha ocurrido un error en el sistema', 'Aceptar', { duration: 3000 });
+      },
+      complete: () => {
+        console.log('Solicitud completada');
       }
-    );
+    });
+
   }
   limitarLongitud1(event: any) {
     const input = event.target;

@@ -1,0 +1,73 @@
+<body>
+  <div class="container">
+    <h2 class="text-center"><i class="fas fa-edit"></i> Actualizar Producto</h2>
+<hr>
+
+<div *ngIf="producto">
+  <form class="form-grid" (submit)="actualizarProducto()" enctype="multipart/form-data">
+
+    <div class="form-row">
+      <div class="form-column">
+        <mat-form-field appearance="outline">
+          <mat-label><i class="fas fa-box"></i> Nombre</mat-label>
+          <input type="text" name="nombre" [(ngModel)]="producto.nombre" required matInput>
+        </mat-form-field>
+      </div>
+      <div class="form-column">
+        <mat-form-field appearance="outline">
+          <mat-label><i class="fas fa-file-alt"></i> Descripción</mat-label>
+          <input type="text" name="descripcion" [(ngModel)]="producto.descripcion" required matInput>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-column">
+        <mat-form-field appearance="outline">
+          <mat-label><i class="fas fa-dollar-sign"></i> Precio</mat-label>
+          <input type="number" name="precio" [(ngModel)]="producto.precio" required matInput
+                 (input)="validarNumeroPositivo($event)">
+        </mat-form-field>
+      </div>
+      <div class="form-column">
+        <mat-form-field appearance="outline">
+          <mat-label><i class="fas fa-sort-numeric-up"></i> Stock</mat-label>
+          <input type="number" name="stock" [(ngModel)]="producto.stock" required matInput
+                 (input)="validarNumeroPositivo($event)">
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-column">
+        <mat-form-field appearance="outline">
+          <mat-label><i class="fas fa-map-marker-alt"></i> Ubicación</mat-label>
+          <input type="text" name="ubicacion" [(ngModel)]="producto.ubicacion" required matInput>
+        </mat-form-field>
+      </div>
+      <div class="form-column">
+        <mat-form-field appearance="outline">
+          <mat-label><i class="fas fa-truck"></i> Proveedor</mat-label>
+          <mat-select name="proveedorId" [(ngModel)]="producto.proveedor.proveedorId">
+            <mat-option *ngFor="let proveedor of proveedores" [value]="proveedor.proveedorId">
+              {{ proveedor.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-column">
+        <button type="submit" class="btn-action">
+          <i class="fas fa-sync-alt"></i> Actualizar
+        </button>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+  </div>
+
+</body>

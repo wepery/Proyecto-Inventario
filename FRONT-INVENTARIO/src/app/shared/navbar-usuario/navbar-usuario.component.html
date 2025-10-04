@@ -1,0 +1,68 @@
+<!-- SIDEBAR -->
+
+<body>
+
+
+  <section id="sidebar" [ngClass]="status ? 'hide' : ''" >
+    <a href="#" class="brand">
+      <img src="../../../../assets/img/logo.png" alt="" class="imagen">
+
+    </a>
+
+    <ul class="side-menu top">
+       <li [ngClass]="{'active': isActive('/user-dashboard')}">
+        <a routerLink="/user-dashboard">
+               <i class="fas fa-home"></i>
+          <span class="texto">Principal</span>
+        </a>
+      </li>
+
+      <li [ngClass]="{'active': isActive('/user-dashboard/inventario')}">
+        <a routerLink="/user-dashboard/inventario">
+          <i class="fas fa-box"></i>
+          <span class="texto">Inventario</span>
+        </a>
+      </li>
+
+      <li [ngClass]="{'active': isActive('/user-dashboard/entradas-usuario')}">
+        <a routerLink="/user-dashboard/entradas-usuario">
+          <i class="fas fa-sign-in-alt"></i>
+          <span class="texto">Entradas</span>
+        </a>
+      </li>
+      <li [ngClass]="{'active': isActive('/user-dashboard/salidas-usuario')}">
+        <a routerLink="/user-dashboard/salidas-usuario">
+          <i class="fas fa-sign-out-alt"></i>
+          <span class="texto">Salida</span>
+        </a>
+      </li>
+    </ul>
+    <ul class="side-menu">
+      <li [ngClass]="{'active': isActive('/user-dashboard/configuracion')}">
+        <a routerLink="/user-dashboard/configuracion">
+          <i class="fas fa-cog"></i>
+          <span class="texto">Configuración</span>
+        </a>
+      </li>
+      <li>
+        <a *ngIf="isLoggedIn" (click)="logout()" class="logout">
+          <i class="fas fa-sign-out-alt"></i>
+          <span class="texto">Cerrar Sesión</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <!-- CONTENT -->
+  <section id="content">
+    <!-- NAVBAR -->
+    <nav>
+      <i (click)="addToggle()" class="fas fa-bars"></i>
+      <span *ngIf="isLoggedIn && user" class="user-info">{{ user.username }}</span>
+    </nav>
+    <main>
+      <router-outlet></router-outlet>
+    </main>
+
+  </section>
+</body>

@@ -1,42 +1,46 @@
-<br>
-<div class="row">
-    <div class="col-md-4 mb-3">
-        <button class="btn btn-primary btn-block" routerLink="/user-dashboard/entradas-usuario/registrar-entradas">Registrar Entrada
+<body>
+    <div class="container">
+        <h2><i class="fas fa-sign-in-alt"></i> Módulo de Entradas</h2>
+        <hr />
+        <div class="action-buttons">
+            <button class="btn-action" routerLink="/user-dashboard/entradas-usuario/registrar-entradas">
+                <i class="fas fa-plus-circle"></i>Registrar Entrada
             </button>
-    </div>
-</div>
-<div class="col-md-4 mb-3">
-    <button class="btn btn-primary btn-block" (click)="descargarPDF()">Generar Reporte</button>
-</div>
-<div>
+            <button class="btn-action" (click)="descargarPDF()">
+                <i class="fas fa-file-pdf"></i> Generar Reporte
+            </button>
+        </div>
+        <table class="table table-bordered">
+            <thead class="text-center">
+                <tr>
+                    <th>Código</th>
+                    <th>Producto</th>
+                    <th>Descripcion</th>
+                    <th>Cantidad</th>
+                    <th>Fecha de Entrada</th>
+                    <th>Responsable</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                <tr *ngFor="let entradas of detalleEntrada">
+                    <td>{{ entradas.detalleEntradaId }}</td>
+                    <td>{{ entradas.producto?.nombre }}</td>
+                    <td>{{ entradas.descripcion }}</td>
+                    <td>{{ entradas.cantidad }}</td>
+                    <td>{{entradas.entrada.fechaEntrada}}</td>
+                    <td>{{entradas.usuario.nombre}}</td>
+                    <td>
+                        <button class="btn-details"
+                            routerLink="/user-dashboard/entradas/detalle/{{entradas.detalleEntradaId }}"><i
+                                class='bx bx-info-circle'></i></button>
 
-    <table class="table table-bordered">
-        <thead style="background-color: deepskyblue;" class="text-center">
-            <tr>
-                <th>Código</th>
-                <th>Producto</th>
-                <th>Descripcion</th>
-                <th>Cantidad</th>
-                <th>Fecha de Entrada</th>
-                <th>Responsable</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody class="text-center">
-            <tr *ngFor="let entradas of detalleEntrada">
-                <td>{{ entradas.detalleEntradaId }}</td>
-                <td>{{ entradas.producto?.nombre }}</td>
-                <td>{{ entradas.descripcion }}</td>
-                <td>{{ entradas.cantidad }}</td>
-                <td>{{entradas.entrada.fechaEntrada}}</td>
-                <td>{{entradas.usuario.nombre}}</td>
-                <td>
-                    <button class="btn btn-success"
-                        routerLink="/user-dashboard/entradas/detalle/{{entradas.detalleEntradaId }}"><i
-                            class='bx bx-info-circle'></i></button>
-                 
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+
+</body>

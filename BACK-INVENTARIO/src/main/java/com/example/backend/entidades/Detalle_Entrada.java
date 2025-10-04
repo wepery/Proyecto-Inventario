@@ -9,7 +9,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 
-import com.example.backend.security.model.Usuario;
+import com.example.backend.entity.Usuario;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 

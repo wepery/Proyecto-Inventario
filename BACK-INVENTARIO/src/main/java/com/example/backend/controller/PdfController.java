@@ -2,7 +2,6 @@ package com.example.backend.controller;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,98 +12,110 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.backend.servicio.pdf.EntradasPDF;
-import com.example.backend.servicio.pdf.ProductoPDF;
-import com.example.backend.servicio.pdf.ProveedorPDF;
-import com.example.backend.servicio.pdf.SalidasPDF;
-import com.example.backend.servicio.pdf.UsuarioAdministradorPDF;
-import com.example.backend.servicio.pdf.UsuarioOperadorPDF;
+import com.example.backend.pdf.EntradasPDF;
+import com.example.backend.pdf.ProductoPDF;
+import com.example.backend.pdf.ProveedorPDF;
+import com.example.backend.pdf.SalidasPDF;
+import com.example.backend.pdf.UsuarioAdministradorPDF;
+import com.example.backend.pdf.UsuarioOperadorPDF;
 import com.itextpdf.text.DocumentException;
 
 @RestController
 @RequestMapping("/pdf")
-@CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT,
-		RequestMethod.DELETE }, allowedHeaders = "*")
+@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT,
+        RequestMethod.DELETE}, allowedHeaders = "*")
 public class PdfController {
-	@Autowired
-	private ProductoPDF pdfService;
-	@Autowired
-	private SalidasPDF salidasPDF;
+    @RestController
+    @RequestMapping("/pdf")
+    public class PDFController {
 
-	@Autowired
-	private EntradasPDF entradasPDF;
-	
-	@Autowired
-	private UsuarioAdministradorPDF administradorPDF;
-	
-	@Autowired
-	private UsuarioOperadorPDF operadorPDF;
-	
-	@Autowired
-	private ProveedorPDF proveedorPDF;
-	
-	@GetMapping("/generar-productos")
-	public ResponseEntity<byte[]> generarInformePdfProdcutos() throws IOException, DocumentException {
-		byte[] pdfBytes = pdfService.generarInformePdf();
+        private final ProductoPDF pdfService;
+        private final SalidasPDF salidasPDF;
+        private final EntradasPDF entradasPDF;
+        private final UsuarioAdministradorPDF administradorPDF;
+        private final UsuarioOperadorPDF operadorPDF;
+        private final ProveedorPDF proveedorPDF;
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_PDF);
-		headers.setContentDispositionFormData("inline", "informe_productos_activos.pdf");
+        // Constructor
+        public PDFController(ProductoPDF pdfService,
+                             SalidasPDF salidasPDF,
+                             EntradasPDF entradasPDF,
+                             UsuarioAdministradorPDF administradorPDF,
+                             UsuarioOperadorPDF operadorPDF,
+                             ProveedorPDF proveedorPDF) {
+            this.pdfService = pdfService;
+            this.salidasPDF = salidasPDF;
+            this.entradasPDF = entradasPDF;
+            this.administradorPDF = administradorPDF;
+            this.operadorPDF = operadorPDF;
+            this.proveedorPDF = proveedorPDF;
+        }
 
-		return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
-	}
+        @GetMapping("/generar-productos")
+        public ResponseEntity<byte[]> generarInformePdfProdcutos() throws IOException, DocumentException {
+            byte[] pdfBytes = pdfService.generarInformePdf();
 
-	@GetMapping("/generar-salidas")
-	public ResponseEntity<byte[]> generarInformePdfSalidas() throws IOException, DocumentException {
-		byte[] pdfBytes = salidasPDF.generarInformePdf();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("inline", "informe_productos_activos.pdf");
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_PDF);
-		headers.setContentDispositionFormData("inline", "informe_detalle_salidas_productos.pdf");
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        }
 
-		return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
-	}
-	
-	@GetMapping("/generar-entradas")
-	public ResponseEntity<byte[]> generarInformePdfEntradas() throws IOException, DocumentException {
-		byte[] pdfBytes = entradasPDF.generarInformePdf();
+        @GetMapping("/generar-salidas")
+        public ResponseEntity<byte[]> generarInformePdfSalidas() throws IOException, DocumentException {
+            byte[] pdfBytes = salidasPDF.generarInformePdf();
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_PDF);
-		headers.setContentDispositionFormData("inline", "informe_detalle_entradas_productos.pdf");
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("inline", "informe_detalle_salidas_productos.pdf");
 
-		return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
-	}
-	
-	
-	@GetMapping("/generar-proveedor")
-	public ResponseEntity<byte[]> generarInformePdfProveedor() throws IOException, DocumentException {
-		byte[] pdfBytes = proveedorPDF.generarInformePdf();
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        }
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_PDF);
-		headers.setContentDispositionFormData("inline", "informe_detalle_proveedores.pdf");
+        @GetMapping("/generar-entradas")
+        public ResponseEntity<byte[]> generarInformePdfEntradas() throws IOException, DocumentException {
+            byte[] pdfBytes = entradasPDF.generarInformePdf();
 
-		return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
-	}/*
-	@GetMapping("/generar-administrador")
-	public ResponseEntity<byte[]> generarInformePdfAdmin() throws IOException, DocumentException {
-		byte[] pdfBytes = administradorPDF.generarInformePdf();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("inline", "informe_detalle_entradas_productos.pdf");
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_PDF);
-		headers.setContentDispositionFormData("inline", "informe_administradores.pdf");
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        }
 
-		return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
-	}
-	@GetMapping("/generar-operador")
-	public ResponseEntity<byte[]> generarInformePdfOperador() throws IOException, DocumentException {
-		byte[] pdfBytes = operadorPDF.generarInformePdf();
 
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_PDF);
-		headers.setContentDispositionFormData("inline", "informe_operador.pdf");
+        @GetMapping("/generar-proveedor")
+        public ResponseEntity<byte[]> generarInformePdfProveedor() throws IOException, DocumentException {
+            byte[] pdfBytes = proveedorPDF.generarInformePdf();
 
-		return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
-	}*/
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("inline", "informe_detalle_proveedores.pdf");
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        }
+
+        @GetMapping("/generar-administrador")
+        public ResponseEntity<byte[]> generarInformePdfAdmin() throws IOException, DocumentException {
+            byte[] pdfBytes = administradorPDF.generarInformePdf();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("inline", "informe_administradores.pdf");
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        }
+
+        @GetMapping("/generar-operador")
+        public ResponseEntity<byte[]> generarInformePdfOperador() throws IOException, DocumentException {
+            byte[] pdfBytes = operadorPDF.generarInformePdf();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("inline", "informe_operador.pdf");
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        }
+    }
 }

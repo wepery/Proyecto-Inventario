@@ -1,9 +1,9 @@
 package com.example.backend.controller;
 
 
-import com.example.backend.security.dto.UsuarioRequestDTO;
-import com.example.backend.security.model.Usuario;
-import com.example.backend.security.service.UsuarioService;
+import com.example.backend.dto.UsuarioRequestDTO;
+import com.example.backend.entity.Usuario;
+import com.example.backend.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,37 +18,22 @@ import java.util.List;
         RequestMethod.DELETE}, allowedHeaders = "*")
 public class UsuarioController {
 
-    @Autowired
-    private UsuarioService usuarioService;
+    private final UsuarioService usuarioService;
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
 
     // registrar usuarios normales
     @PostMapping("/guardar-normal")
     public ResponseEntity<?> guardarNormal(@RequestBody UsuarioRequestDTO admin) {
-        try {
-            // asignamos ADMIN de forma fija
-            admin.setRol("NORMAL");
-
-            return ResponseEntity.ok(usuarioService.registrarUsuario(admin));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(e.getMessage());
-        }
+        return ResponseEntity.ok(usuarioService.registrarUsuario(admin));
     }
 
     // registrar usuarios admin
     @PostMapping("/guardar-admin")
     public ResponseEntity<?> guardarAdmin(@RequestBody UsuarioRequestDTO admin) {
-        try {
-
-            return ResponseEntity.ok(usuarioService.registrarUsuario(admin));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(e.getMessage());
-        }
+        return ResponseEntity.ok(usuarioService.registrarUsuario(admin));
     }
 
     // 🔹 Administradores ACTIVADOS
@@ -85,20 +70,17 @@ public class UsuarioController {
         Usuario usuario = usuarioService.listarPorId(id);
         return ResponseEntity.ok(usuario);
     }
+
     // 🔹 Desactivar usuario (estado = false)
     @PutMapping("/desactivar/{id}")
-    public ResponseEntity<String> desactivarUsuario(@PathVariable("id") Long  id) {
-
-
-            Usuario usuarioActualizado = usuarioService.eliminarUsuario(id);
-            return ResponseEntity.ok("SE DESACTIVO CORRECTAMENTE");
-
-
+    public ResponseEntity<String> desactivarUsuario(@PathVariable("id") Long id) {
+        Usuario usuarioActualizado = usuarioService.eliminarUsuario(id);
+        return ResponseEntity.ok("SE DESACTIVO CORRECTAMENTE");
     }
 
     // 🔹 Activar usuario (estado = true)
     @PutMapping("/activar/{id}")
-    public ResponseEntity<Usuario> activarUsuario(@PathVariable("id") Long  id) {
+    public ResponseEntity<Usuario> activarUsuario(@PathVariable("id") Long id) {
         Usuario usuarioActualizado = usuarioService.activarUsuario(id);
         return ResponseEntity.ok(usuarioActualizado);
     }

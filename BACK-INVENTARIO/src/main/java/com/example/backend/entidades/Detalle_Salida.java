@@ -1,6 +1,6 @@
 package com.example.backend.entidades;
 
-import com.example.backend.security.model.Usuario;
+import com.example.backend.entity.Usuario;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

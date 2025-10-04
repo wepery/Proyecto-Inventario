@@ -1,20 +1,17 @@
-<br>
-<div class="row">
-    <div class="col-md-4 mb-3">
-        <button class="btn btn-primary btn-block" routerLink="/user-dashboard/salidas-usuario/registrar-salidas">Registrar
-            Salida</button>
-    </div>
-    <br>
-
-</div>
-<div class="col-md-4 mb-3">
-    <button class="btn btn-primary btn-block" (click)="descargarPDF()">Generar Reporte
-    </button>
-</div>
-<div>
-
-    <table class="table table-bordered">
-        <thead style="background-color: deepskyblue;" class="text-center">
+<body>
+    <div class="container">
+        <h2><i class="fas fa-sign-out-alt"></i> Módulo de Salidas</h2>
+        <hr>
+        <div class="action-buttons">
+            <button class="btn-action"  routerLink="/user-dashboard/salidas-usuario/registrar-salidas">
+                <i class="fas fa-plus-circle"></i> Registrar Salida
+            </button>
+            <button class="btn-action" (click)="descargarPDF()">
+                <i class="fas fa-file-pdf"></i> Generar Reporte
+            </button>
+        </div>
+            <table class="table table-bordered">
+        <thead  class="text-center">
             <tr>
                 <th>Código</th>
                 <th>Producto</th>
@@ -35,10 +32,12 @@
                 <td>{{salida.salida.fechaSalida}}</td>
                 <td>{{salida.usuario.nombre}}</td>
                 <td>
-                    <button class="btn btn-success" routerLink="/user-dashboard/salidas/detalle/{{salida.detalleSalidaId }}"><i
+                    <button class="btn-details"
+                        routerLink="/user-dashboard/salidas/detalle/{{salida.detalleSalidaId }}"><i
                             class='bx bx-info-circle'></i></button>
                 </td>
             </tr>
         </tbody>
     </table>
-</div>
+    </div>
+</body>

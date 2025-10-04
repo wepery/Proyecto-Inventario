@@ -1,40 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { DetalleEntrada } from 'src/app/core/models/detalle-entrada';
 import { EntradaService } from 'src/app/core/services/entrada.service';
 import { LoginService } from 'src/app/core/services/login.service';
 import { ProductoService } from 'src/app/core/services/producto.service';
 import swal from 'sweetalert2';
+
 @Component({
   selector: 'app-registrar-entrada',
   templateUrl: './registrar-entrada.component.html',
   styleUrls: ['./registrar-entrada.component.css']
 })
 export class RegistrarEntradaComponent implements OnInit {
-  detalleEntradaForm!: FormGroup;
 
-  fechaEntrada: string = "";
-  listaDetalleEntrada: any[] = [];
+  detalleEntradaForm!: FormGroup;
   producto: any[] = [];
   isLoggedIn = false;
   user: any = null;
-
-  detalleEntrada: any = {
-
-    descripcion: '',
-    cantidad: '',
-
-    producto: {
-      productoId: '',
-    },
-    usuario: {
-      id: '',
-    },
-    entrada: {
-      fechaEntrada: '',
-    },
-  };
+  listaDetalleEntrada: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -45,6 +28,7 @@ export class RegistrarEntradaComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    // Inicializa el FormGroup
     this.detalleEntradaForm = this.fb.group({
       productoId: ['', Validators.required],
       descripcion: ['', Validators.required],
@@ -55,12 +39,52 @@ export class RegistrarEntradaComponent implements OnInit {
     this.obtenerProducto();
     this.obtenerUsuario();
   }
+
+  // Obtiene los productos activos
+  obtenerProducto() {
+    this.productoService.listarProductoActivadas().subscribe(
+      (data: any) => this.producto = data,
+      (error: any) => console.error('Error al obtener productos:', error)
+    );
+  }
+
+  // Obtiene el usuario logueado
+  obtenerUsuario() {
+    this.isLoggedIn = this.login.isLoggedIn();
+    this.user = this.login.getUser();
+    this.login.loginStatusSubjec.asObservable().subscribe(() => {
+      this.isLoggedIn = this.login.isLoggedIn();
+      this.user = this.login.getUser();
+    });
+  }
+
+  // Agrega un detalle al listado
+  agregarProducto() {
+    if (this.detalleEntradaForm.invalid) {
+      swal.fire('Error', 'Complete todos los campos antes de agregar.', 'error');
+      return;
+    }
+
+    const detalle = {
+      producto: { productoId: this.detalleEntradaForm.value.productoId },
+      descripcion: this.detalleEntradaForm.value.descripcion,
+      cantidad: this.detalleEntradaForm.value.cantidad,
+      usuario: { id: this.user.id },
+      entrada: { fechaEntrada: this.detalleEntradaForm.value.fechaEntrada }
+    };
+
+    this.listaDetalleEntrada.push(detalle);
+    this.detalleEntradaForm.reset();
+  }
+
+  // Envía todos los detalles al backend
   enviarEntrada() {
     if (this.listaDetalleEntrada.length === 0) {
       swal.fire('Error', 'Agregue al menos un registro antes de enviar.', 'error');
       return;
     }
 
+    // Asigna el usuario a todos los detalles
     this.listaDetalleEntrada.forEach(d => d.usuario.id = this.user.id);
 
     this.entradaService.crearEntradaConDetalles(this.listaDetalleEntrada)
@@ -71,65 +95,23 @@ export class RegistrarEntradaComponent implements OnInit {
           this.detalleEntradaForm.reset();
           this.router.navigate(['/admin/entradas']);
         },
-        error: err => {
+        error: (err) => {
           console.error(err);
           swal.fire('Error', 'Hubo un problema al enviar la entrada.', 'error');
         }
       });
   }
 
-
-
-  obtenerProducto() {
-    this.productoService.listarProductoActivadas().subscribe(
-      (producto: any) => {
-        this.producto = producto;
-      },
-      (error: any) => {
-        console.log("Error al obtener las categorías: ", error);
-      }
-    );
-  }
-  obtenerUsuario() {
-    this.isLoggedIn = this.login.isLoggedIn();
-    this.user = this.login.getUser();
-    this.login.loginStatusSubjec.asObservable().subscribe(
-      data => {
-        this.isLoggedIn = this.login.isLoggedIn();
-        this.user = this.login.getUser();
-      }
-    )
-  }
-
-  agregarProducto() {
-    if (this.detalleEntradaForm.invalid) return;
-
-    const detalle: DetalleEntrada = {
-      descripcion: this.detalleEntradaForm.value.descripcion,
-      cantidad: this.detalleEntradaForm.value.cantidad,
-      producto: { productoId: this.detalleEntradaForm.value.productoId },
-      usuario: { id: this.user.id },
-      entrada: { fechaEntrada: this.detalleEntradaForm.value.fechaEntrada }
-    };
-    this.listaDetalleEntrada.push(detalle);
-    this.detalleEntradaForm.reset();
-  }
-
-
+  // Validación de número positivo para cantidad
   guardarValor(event: any) {
-    const inputElement = event.target as HTMLInputElement;
-    let inputValue = inputElement.value;
-
-    inputValue = inputValue.replace(/[^0-9-]/g, '');
-    if (inputValue.charAt(0) === '-' && inputValue.length > 1) {
-      inputValue = '-' + inputValue.replace('-', '');
-    } else {
-      inputValue = inputValue.replace('-', '');
-    }
-    inputElement.value = inputValue;
+    const input = event.target as HTMLInputElement;
+    let value = input.value.replace(/[^0-9]/g, '');
+    input.value = value;
   }
 
-
-
+  // Permite eliminar un detalle de la lista
+  eliminarDetalle(index: number) {
+    this.listaDetalleEntrada.splice(index, 1);
+  }
 
 }

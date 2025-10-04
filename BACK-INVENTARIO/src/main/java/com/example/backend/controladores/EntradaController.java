@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
 
-import com.example.backend.entidades.Detalle_Entrada;
-import com.example.backend.entidades.Entradas;
-import com.example.backend.entidades.Producto;
+import com.example.backend.entity.Detalle_Entrada;
+import com.example.backend.entity.Entradas;
+import com.example.backend.entity.Producto;
 
-import com.example.backend.repositorios.Detalle_EntradaRepository;
-import com.example.backend.repositorios.EntradaRepository;
-import com.example.backend.repositorios.ProductoRepository;
+import com.example.backend.repository.Detalle_EntradaRepository;
+import com.example.backend.repository.EntradaRepository;
+import com.example.backend.repository.ProductoRepository;
 
 @RestController
 @RequestMapping("/entradas")
@@ -62,13 +62,6 @@ public class EntradaController {
 					Producto updateProducto = productoRepository.findById(producto.getProductoId()).orElse(null);
 					int cantidadIngresada = detalleEntrada.getCantidad();
 
-					// Verifica que los campos obligatorios del producto tengan valores vÃ¡lidos
-					/*
-					 * if (producto.getNombre() == null || producto.getPrecio() == null ||
-					 * producto.getDescripcion() == null || producto.getUbicacion() == null ||
-					 * producto.getProveedor() == null) { return ResponseEntity.badRequest().
-					 * body("Los campos obligatorios del producto no pueden ser nulos."); }
-					 */
 
 					if (updateProducto == null) {
 						return ResponseEntity.badRequest()

@@ -1,6 +1,6 @@
 package com.example.backend.service;
 
-import com.example.backend.entidades.Reclamos;
+import com.example.backend.entity.Reclamos;
 
 import java.util.List;
 
@@ -19,6 +19,8 @@ public interface ReclamoService {
     boolean activarReclamo(Long id);
 
     List<Reclamos> obtenerReclamosDesactivados();
+
     List<Reclamos> obtenerReclamosActivados();
+
     Reclamos agregarReclamo(Reclamos reclamo);
 }

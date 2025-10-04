@@ -1,4 +1,4 @@
-package com.example.backend.entidades;
+package com.example.backend.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,14 +22,9 @@ public class Producto {
 	private int stock;
 	private boolean estado;
 
-
 	@ManyToOne
 	@JoinColumn(name = "proveedorId")
 	private Proveedor proveedor;
-
-
-
-	
 
 
 	@Override

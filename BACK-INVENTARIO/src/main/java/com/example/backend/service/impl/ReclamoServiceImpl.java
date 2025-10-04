@@ -1,14 +1,15 @@
 package com.example.backend.service.impl;
 
-import com.example.backend.entidades.Reclamos;
-import com.example.backend.repositorios.ReclamoRepository;
+import com.example.backend.entity.Reclamos;
+import com.example.backend.repository.ReclamoRepository;
 import com.example.backend.service.ReclamoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Service
 public class ReclamoServiceImpl implements ReclamoService {
 
     private final JavaMailSender javaMailSender;

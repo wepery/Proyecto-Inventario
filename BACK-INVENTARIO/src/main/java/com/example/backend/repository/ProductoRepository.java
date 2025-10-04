@@ -1,10 +1,10 @@
-package com.example.backend.repositorios;
+package com.example.backend.repository;
 
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.backend.entidades.Producto;
+import com.example.backend.entity.Producto;
 
 
 public interface ProductoRepository extends JpaRepository<Producto, Long>{

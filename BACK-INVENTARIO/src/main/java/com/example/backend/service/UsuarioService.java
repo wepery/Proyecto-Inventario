@@ -9,9 +9,9 @@ import java.util.Optional;
 public interface UsuarioService {
     Usuario registrarUsuario(UsuarioRequestDTO usuario);
 
-    Usuario eliminarUsuario(Long  usuarioId);
+    Usuario eliminarUsuario(Long usuarioId);
 
-    Usuario activarUsuario(Long  usuarioId);
+    Usuario activarUsuario(Long usuarioId);
 
     Optional<Usuario> listarCodigo(String codigo);
 
@@ -38,6 +38,7 @@ public interface UsuarioService {
     List<Usuario> listarUsuarioNormalActivado();
 
     List<Usuario> listarUsuarioNormalDesactivado();
+
     Usuario listarPorId(Long id);
 }
 

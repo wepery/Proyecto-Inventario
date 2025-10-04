@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
-import com.example.backend.entidades.Reclamos;
+import com.example.backend.entity.Reclamos;
 
 import org.springframework.web.bind.annotation.RequestMethod;
 

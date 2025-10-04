@@ -1,4 +1,4 @@
-package com.example.backend.entidades;
+package com.example.backend.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,17 +9,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 
-import com.example.backend.entity.Usuario;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-
 @Entity
-@Table(name = "detalle_entrada")
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class Detalle_Entrada {
+@Table(name = "detalle_salida")
+public class Detalle_Salida {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long detalleEntradaId;
+	private Long detalleSalidaId;
 	private int cantidad;
 	private String descripcion;
 
@@ -28,31 +23,34 @@ public class Detalle_Entrada {
 	private Usuario usuario;
 
 	@ManyToOne
-	@JoinColumn(name = "productoId")
+	@JoinColumn(name = "productoId", nullable = false)
 	private Producto producto;
+
 	@ManyToOne
-	@JoinColumn(name = "entradaId", nullable = false)
-	private Entradas entrada;
+	@JoinColumn(name = "salidaId", nullable = false)
+	private Salidas salida;
 
-	public Detalle_Entrada() {
+	public Detalle_Salida(Long detalleSalidaId, int cantidad, String descripcion, Usuario usuario, Producto producto,
+			Salidas salida) {
 		super();
-	}
-
-	public Detalle_Entrada(int cantidad, String descripcion, Usuario usuario, Producto producto, Entradas entrada) {
-		super();
+		this.detalleSalidaId = detalleSalidaId;
 		this.cantidad = cantidad;
 		this.descripcion = descripcion;
 		this.usuario = usuario;
 		this.producto = producto;
-		this.entrada = entrada;
+		this.salida = salida;
 	}
 
-	public Long getDetalleEntradaId() {
-		return detalleEntradaId;
+	public Detalle_Salida() {
+		super();
 	}
 
-	public void setDetalleEntradaId(Long detalleEntradaId) {
-		this.detalleEntradaId = detalleEntradaId;
+	public Long getDetalleSalidaId() {
+		return detalleSalidaId;
+	}
+
+	public void setDetalleSalidaId(Long detalleSalidaId) {
+		this.detalleSalidaId = detalleSalidaId;
 	}
 
 	public int getCantidad() {
@@ -87,12 +85,12 @@ public class Detalle_Entrada {
 		this.producto = producto;
 	}
 
-	public Entradas getEntrada() {
-		return entrada;
+	public Salidas getSalida() {
+		return salida;
 	}
 
-	public void setEntrada(Entradas entrada) {
-		this.entrada = entrada;
+	public void setSalida(Salidas salida) {
+		this.salida = salida;
 	}
 
 }

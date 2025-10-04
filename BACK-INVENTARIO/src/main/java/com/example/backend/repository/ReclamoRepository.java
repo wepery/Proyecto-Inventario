@@ -1,11 +1,11 @@
-package com.example.backend.repositorios;
+package com.example.backend.repository;
 
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 
-import com.example.backend.entidades.Reclamos;
+import com.example.backend.entity.Reclamos;
 
 public interface ReclamoRepository extends JpaRepository<Reclamos, Long> {
 	List<Reclamos> findByEstadoIsTrue();

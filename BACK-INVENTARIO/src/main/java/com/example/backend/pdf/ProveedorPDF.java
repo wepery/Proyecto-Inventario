@@ -6,10 +6,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.backend.entidades.Producto;
-import com.example.backend.entidades.Proveedor;
-import com.example.backend.repositorios.ProductoRepository;
-import com.example.backend.repositorios.ProveedorRepository;
+import com.example.backend.entity.Proveedor;
+import com.example.backend.repository.ProveedorRepository;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;

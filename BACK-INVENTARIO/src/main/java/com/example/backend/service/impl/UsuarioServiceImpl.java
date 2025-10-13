@@ -21,13 +21,18 @@ import java.util.Optional;
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-    @Autowired
-    private RolRepository rolRepository;
+
+    private  final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    private final  RolRepository rolRepository;
+
+    public UsuarioServiceImpl(UsuarioRepository usuarioRepository, BCryptPasswordEncoder bCryptPasswordEncoder, RolRepository rolRepository) {
+        this.usuarioRepository = usuarioRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.rolRepository = rolRepository;
+    }
 
     @Override
     public Usuario registrarUsuario(UsuarioRequestDTO usuarioDTO) {
@@ -80,21 +85,24 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 
     @Override
-    public Usuario eliminarUsuario(Long  usuarioId) {
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        usuario.setEstado(false);
-        return usuarioRepository.save(usuario);
+    public Usuario eliminarUsuario(Long usuarioId) {
+        return cambiarEstadoUsuario(usuarioId, false);
     }
 
     @Override
-    public Usuario activarUsuario(Long  usuarioId) {
-        Usuario usuario = usuarioRepository.findById((usuarioId))
-                .orElseThrow(() -> new IllegalArgumentException("No se encontre el codigo"));
-        usuario.setEstado(true);
+    public Usuario activarUsuario(Long usuarioId) {
+        return cambiarEstadoUsuario(usuarioId, true);
+    }
+
+
+    private Usuario cambiarEstadoUsuario(Long usuarioId, boolean estado) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario con ID " + usuarioId + " no encontrado"));
+
+        usuario.setEstado(estado);
         return usuarioRepository.save(usuario);
     }
+
 
     //LISTAR POR CODIGO
     @Override

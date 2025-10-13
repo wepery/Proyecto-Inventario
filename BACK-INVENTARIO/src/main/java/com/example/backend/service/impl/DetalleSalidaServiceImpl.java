@@ -79,8 +79,15 @@ public class DetalleSalidaServiceImpl implements DetalleSalidaService {
     @Override
     public List<Detalle_Salida> crearDetalleSalida(List<Detalle_Salida> listaDetalleSalida) {
         List<Detalle_Salida> guardados = new ArrayList<>();
+        if (listaDetalleSalida == null || listaDetalleSalida.isEmpty()) {
+            throw new IllegalArgumentException("La lista de detalles de salida no puede estar vacía");
+        }
+
 
         for (Detalle_Salida detalle : listaDetalleSalida) {
+            if (detalle.getSalida() == null || detalle.getSalida().getFechaSalida() == null) {
+                throw new IllegalArgumentException("Cada detalle debe tener una fecha de salida válida");
+            }
             // Buscar salida existente por fecha
             Optional<Salidas> salidaExistenteOpt = salidaRepository.findByFechaSalida(detalle.getSalida().getFechaSalida());
             Salidas salidaGuardada;
@@ -95,9 +102,17 @@ public class DetalleSalidaServiceImpl implements DetalleSalidaService {
 
             detalle.setSalida(salidaGuardada);
 
-            // Actualizar stock del producto
+            // 🧮 Validar y actualizar el stock del producto
             Producto producto = productoRepository.findById(detalle.getProducto().getProductoId())
-                    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + detalle.getProducto().getProductoId()));
+
+            if (detalle.getCantidad() <= 0) {
+                throw new IllegalArgumentException("La cantidad debe ser mayor a cero para el producto: " + producto.getNombre());
+            }
+
+            if (producto.getStock() < detalle.getCantidad()) {
+                throw new IllegalStateException("Stock insuficiente para el producto: " + producto.getNombre());
+            }
 
             int nuevoStock = producto.getStock() - detalle.getCantidad();
             producto.setStock(nuevoStock);

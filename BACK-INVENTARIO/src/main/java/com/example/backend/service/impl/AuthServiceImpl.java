@@ -10,27 +10,36 @@ import com.example.backend.security.JwtUtils;
 
 import com.example.backend.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private UsuarioService usuarioService;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private JwtUtils jwtUtils;
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+
+    private final UsuarioService usuarioService;
+
+
+    private final JwtUtils jwtUtils;
+
+    private final UserDetailsServiceImpl userDetailsService;
+
+    public AuthServiceImpl(AuthenticationManager authenticationManager, UsuarioService usuarioService, JwtUtils jwtUtils, UserDetailsServiceImpl userDetailsService) {
+        this.authenticationManager = authenticationManager;
+        this.usuarioService = usuarioService;
+        this.jwtUtils = jwtUtils;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Override
     public TokenResponseDTO login(LoginRequestDTO loginRequestDTO) {
@@ -60,12 +69,13 @@ public class AuthServiceImpl implements AuthService {
         Usuario usuario = (Usuario) this.userDetailsService.loadUserByUsername(principal.getName());
         return usuario;
     }
-    public void validarIdentificador(String identificador) {
-        boolean existe;
-        existe = usuarioService.usuarioExistePorUsername(identificador);
+    private void validarIdentificador(String identificador) {
+        if (identificador == null || identificador.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El identificador no puede estar vacío");
+        }
 
-        if (!existe) {
-            throw new IllegalArgumentException("Usuario no encontrado");
+        if (!usuarioService.usuarioExistePorUsername(identificador)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
         }
     }
 

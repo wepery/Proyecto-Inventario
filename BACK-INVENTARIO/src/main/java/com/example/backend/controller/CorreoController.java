@@ -13,8 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CorreoController {
-    @Autowired
-    private ReclamoService reclamoService;
+
+    private final ReclamoService reclamoService;
+
+    public CorreoController(ReclamoService reclamoService) {
+        this.reclamoService = reclamoService;
+    }
 
     @PostMapping("/reclamo/{id}/enviar-disculpas")
     public ResponseEntity<String> enviarDisculpas(@PathVariable Long id, @RequestBody String mensaje) {

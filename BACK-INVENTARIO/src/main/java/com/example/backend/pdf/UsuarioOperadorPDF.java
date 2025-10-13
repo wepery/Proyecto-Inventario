@@ -22,10 +22,14 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 @Service
 public class UsuarioOperadorPDF {
-	@Autowired
-	private UsuarioService usuarioRepository;
-	
-	public byte[] generarInformePdf() throws DocumentException {
+
+	private final UsuarioService usuarioRepository;
+
+    public UsuarioOperadorPDF(UsuarioService usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
+    }
+
+    public byte[] generarInformePdf() throws DocumentException {
 		List<Usuario> productosActivos = usuarioRepository.listarUsuarioNormalActivado();;
 
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

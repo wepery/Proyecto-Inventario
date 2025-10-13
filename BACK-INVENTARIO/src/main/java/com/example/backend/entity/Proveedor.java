@@ -76,5 +76,6 @@ public class Proveedor {
 	public void setEstado(boolean estado) {
 		this.estado = estado;
 	}
-	
+
+
 }

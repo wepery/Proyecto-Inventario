@@ -24,10 +24,14 @@ import com.itextpdf.text.pdf.PdfWriter;
 @Service
 public class SalidasPDF {
 
-	@Autowired
-	private Detalle_SalidaRepository salidaRepository;
-	
-	public byte[] generarInformePdf() throws DocumentException {
+
+	private  final Detalle_SalidaRepository salidaRepository;
+
+    public SalidasPDF(Detalle_SalidaRepository salidaRepository) {
+        this.salidaRepository = salidaRepository;
+    }
+
+    public byte[] generarInformePdf() throws DocumentException {
 		List<Detalle_Salida> productosActivos = salidaRepository.findAll();
 
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

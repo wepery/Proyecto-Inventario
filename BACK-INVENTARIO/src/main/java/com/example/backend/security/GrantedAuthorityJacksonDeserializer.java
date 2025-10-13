@@ -1,6 +1,7 @@
 package com.example.backend.security;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
@@ -9,6 +10,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.io.IOException;
 
+/**
+ * Custom deserializer para convertir JSON en objetos {@link GrantedAuthority}.
+ *
+ * Ejemplo de JSON:
+ * { "authority": "ROLE_ADMIN" }
+ */
 public class GrantedAuthorityJacksonDeserializer extends StdDeserializer<GrantedAuthority> {
 
     private static final long serialVersionUID = 1L;
@@ -18,10 +25,19 @@ public class GrantedAuthorityJacksonDeserializer extends StdDeserializer<Granted
     }
 
     @Override
-    public GrantedAuthority deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
-            throws IOException {
-        JsonNode node = jsonParser.getCodec().readTree(jsonParser);
+    public GrantedAuthority deserialize(JsonParser parser, DeserializationContext context)
+            throws IOException, JsonProcessingException {
+
+        JsonNode node = parser.getCodec().readTree(parser);
+
+        // Validar estructura
+        if (node == null || node.get("authority") == null) {
+            throw new IOException("Formato JSON inválido para GrantedAuthority");
+        }
+
         String authority = node.get("authority").asText();
+
+        // Retorna la autoridad reconstruida
         return new SimpleGrantedAuthority(authority);
     }
 }

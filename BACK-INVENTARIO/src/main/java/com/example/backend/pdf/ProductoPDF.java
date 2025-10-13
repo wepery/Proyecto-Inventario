@@ -22,10 +22,14 @@ import com.itextpdf.text.pdf.PdfWriter;
 @Service
 public class ProductoPDF {
 
-	@Autowired
-	private ProductoRepository productoRepository;
 
-	public byte[] generarInformePdf() throws DocumentException {
+	private final  ProductoRepository productoRepository;
+
+    public ProductoPDF(ProductoRepository productoRepository) {
+        this.productoRepository = productoRepository;
+    }
+
+    public byte[] generarInformePdf() throws DocumentException {
 		List<Producto> productosActivos = productoRepository.findByEstadoIsTrue();
 
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

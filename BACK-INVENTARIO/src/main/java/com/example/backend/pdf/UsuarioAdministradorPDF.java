@@ -23,10 +23,14 @@ import com.itextpdf.text.pdf.PdfWriter;
 @Service
 public class UsuarioAdministradorPDF {
 
-	@Autowired
-	private UsuarioService usuarioService;
 
-	public byte[] generarInformePdf() throws DocumentException {
+	private final UsuarioService usuarioService;
+
+    public UsuarioAdministradorPDF(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
+
+    public byte[] generarInformePdf() throws DocumentException {
 		List<Usuario> productosActivos = usuarioService.listarUsuarioAdminActivado();
 
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

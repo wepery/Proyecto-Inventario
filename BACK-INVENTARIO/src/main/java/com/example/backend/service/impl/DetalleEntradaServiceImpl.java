@@ -30,9 +30,15 @@ public class DetalleEntradaServiceImpl implements DetalleEntradaService {
 
     @Override
     public List<Detalle_Entrada> crearDetalleEntrada(List<Detalle_Entrada> listaDetalleEntrada) {
+        if (listaDetalleEntrada == null || listaDetalleEntrada.isEmpty()) {
+            throw new IllegalArgumentException("La lista de detalles de entrada no puede estar vacía");
+        }
         List<Detalle_Entrada> guardados = new ArrayList<>();
 
         for (Detalle_Entrada detalle : listaDetalleEntrada) {
+            if (detalle.getEntrada() == null || detalle.getEntrada().getFechaEntrada() == null) {
+                throw new IllegalArgumentException("Cada detalle debe incluir una fecha de entrada válida");
+            }
             // Buscar entrada existente por fecha
             Optional<Entradas> entradaExistenteOpt = entradaRepository.findByFechaEntrada(detalle.getEntrada().getFechaEntrada());
             Entradas entradaGuardada;
@@ -47,9 +53,14 @@ public class DetalleEntradaServiceImpl implements DetalleEntradaService {
 
             detalle.setEntrada(entradaGuardada);
 
-            // Actualizar stock del producto
+            // 🧩 Validar y actualizar stock del producto
             Producto producto = productoRepository.findById(detalle.getProducto().getProductoId())
-                    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + detalle.getProducto().getProductoId()));
+
+            if (detalle.getCantidad() <= 0) {
+                throw new IllegalArgumentException("La cantidad debe ser mayor a cero para el producto: " + producto.getNombre());
+            }
+
 
             int nuevoStock = producto.getStock() + detalle.getCantidad();
             producto.setStock(nuevoStock);

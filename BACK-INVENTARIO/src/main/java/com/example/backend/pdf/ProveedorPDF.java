@@ -21,11 +21,16 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 @Service
 public class ProveedorPDF {
-	@Autowired
-	private ProveedorRepository proveedorRepository;
-	
-	
-	public byte[] generarInformePdf() throws DocumentException {
+
+
+	private final ProveedorRepository proveedorRepository;
+
+    public ProveedorPDF(ProveedorRepository proveedorRepository) {
+        this.proveedorRepository = proveedorRepository;
+    }
+
+
+    public byte[] generarInformePdf() throws DocumentException {
 		List<Proveedor> proveedorActivos = proveedorRepository.findByEstadoIsTrue();
 
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

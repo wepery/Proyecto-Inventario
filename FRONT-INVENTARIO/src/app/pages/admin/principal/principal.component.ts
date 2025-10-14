@@ -1,26 +1,34 @@
 import { Component, OnInit } from '@angular/core';
-import { LoginService} from '../../../core/services/login.service';
+import { LoginService } from '../../../core/services/login.service';
+
+interface Usuario {
+  id: number;
+  nombre?: string;
+  email?: string;
+  // Agrega otros campos según tu modelo de usuario
+}
+
 @Component({
   selector: 'app-principal',
   templateUrl: './principal.component.html',
-  styleUrls: ['./principal.component.css']
+  styleUrls: ['./principal.component.css'],
 })
 export class PrincipalComponent implements OnInit {
-
   isLoggedIn = false;
-  user:any = null;
+  user: any | null = null;
 
-  constructor(public login:LoginService) { }
+  constructor(private readonly loginService: LoginService) {}
 
   ngOnInit(): void {
-    this.isLoggedIn = this.login.isLoggedIn();
-    this.user = this.login.getUser();
-    this.login.loginStatusSubjec.asObservable().subscribe(
-      data => {
-        this.isLoggedIn = this.login.isLoggedIn();
-        this.user = this.login.getUser();
-      }
-    )
+    this.actualizarUsuario();
+    // Escucha cambios en el estado de login
+    this.loginService.loginStatusSubjec.asObservable().subscribe(() => {
+      this.actualizarUsuario();
+    });
   }
 
+  private actualizarUsuario(): void {
+    this.isLoggedIn = this.loginService.isLoggedIn();
+    this.user = this.loginService.getUser();
+  }
 }

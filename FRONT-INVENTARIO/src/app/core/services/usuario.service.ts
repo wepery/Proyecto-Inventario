@@ -1,62 +1,91 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import baserUrl from 'src/app/core/models/helper';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import baserUrl from 'src/app/core/models/helper';
+import { API_ENDPOINTS } from '../constants/api-endpoints';
+import { UsuarioValidator } from '../validator/usuario.validator';
+
 @Injectable({
   providedIn: 'root'
 })
 export class UsuarioService {
+  constructor(private http: HttpClient) {}
 
-
-  constructor(private http: HttpClient) { }
-
-  //listar usuario admin
-  public obtenerAdminUsuarioRoles(): Observable<any> {
-    return this.http.get(`${baserUrl}/usuarios/admin/activadas`);
-  }
-  //listar usuario normal
-  public obtenerNormalUsuarioRoles(): Observable<any> {
-    return this.http.get(`${baserUrl}/usuarios/normal/activadas`);
-  }
-  //listar usuario admin desactivados
-  public obtenerAdminUsuarioRolesDesactivados(): Observable<any> {
-    return this.http.get(`${baserUrl}/usuarios/admin/desactivadas`);
-  }
-  //listar usuario normal desactivados
-  public obtenerNormalUsuarioRolesDesactivados(): Observable<any> {
-    return this.http.get(`${baserUrl}/usuarios/normal/desactivadas`);
+  /** ========================
+   *  USUARIOS ADMIN ACTIVADOS
+   * ======================== */
+  obtenerAdminUsuariosActivos(): Observable<any> {
+    return this.http.get(`${baserUrl}${API_ENDPOINTS.usuarios.adminActivos}`);
   }
 
-  //registrar usuarios admin
-  public añadirUsuarioAdmin(user: any) {
-    return this.http.post(`${baserUrl}/usuarios/admin/`, user);
+  /** ========================
+   *  USUARIOS NORMAL ACTIVADOS
+   * ======================== */
+  obtenerUsuariosNormalesActivos(): Observable<any> {
+    return this.http.get(`${baserUrl}${API_ENDPOINTS.usuarios.normalActivos}`);
   }
 
-  public desactivarUsuario1(usuarioRolId: any): Observable<any> {
-    return this.http.post(`${baserUrl}/usuarios/desactivar/${usuarioRolId}`, {});
-  }
-  desactivarUsuario(usuarioRolId: any): Observable<string> {
-    const url = `${baserUrl}/usuarios/desactivar/${usuarioRolId}`;
-    return this.http.put(url, null, { responseType: 'text' });
-  }
-
-  activarUsuario(usuarioRolId: any): Observable<string> {
-    const url = `${baserUrl}/usuarios/activar/${usuarioRolId}`;
-    return this.http.put(url, null, { responseType: 'text' });
+  /** =========================
+   *  USUARIOS ADMIN DESACTIVADOS
+   * ========================= */
+  obtenerAdminUsuariosDesactivados(): Observable<any> {
+    return this.http.get(`${baserUrl}${API_ENDPOINTS.usuarios.adminDesactivados}`);
   }
 
-
-  obtenerUsuarioPorId(usuarioRolId: any): Observable<any> {
-    return this.http.get(`${baserUrl}/usuarios/listarId/${usuarioRolId}`);
+  /** =========================
+   *  USUARIOS NORMAL DESACTIVADOS
+   * ========================= */
+  obtenerUsuariosNormalesDesactivados(): Observable<any> {
+    return this.http.get(`${baserUrl}${API_ENDPOINTS.usuarios.normalDesactivados}`);
   }
+
+  /** ========================
+   *  REGISTRO DE USUARIOS
+   * ======================== */
+  registrarAdmin(user: any): Observable<any> {
+    if (!UsuarioValidator.esUsuarioValido(user)) {
+      throw new Error('Datos de usuario inválidos');
+    }
+    return this.http.post(`${baserUrl}${API_ENDPOINTS.usuarios.registrarAdmin}`, user);
+  }
+
+  registrarNormal(user: any): Observable<any> {
+    if (!UsuarioValidator.esUsuarioValido(user)) {
+      throw new Error('Datos de usuario inválidos');
+    }
+    return this.http.post(`${baserUrl}${API_ENDPOINTS.usuarios.registrarNormal}`, user);
+  }
+
+  /** ========================
+   *  ACTIVAR / DESACTIVAR
+   * ======================== */
+  desactivarUsuario(usuarioRolId: number): Observable<string> {
+    return this.http.put(
+      `${baserUrl}${API_ENDPOINTS.usuarios.desactivar}/${usuarioRolId}`,
+      null,
+      { responseType: 'text' }
+    );
+  }
+
+  activarUsuario(usuarioRolId: number): Observable<string> {
+    return this.http.put(
+      `${baserUrl}${API_ENDPOINTS.usuarios.activar}/${usuarioRolId}`,
+      null,
+      { responseType: 'text' }
+    );
+  }
+
+  /** ========================
+   *  CRUD ADICIONAL
+   * ======================== */
+  obtenerUsuarioPorId(usuarioRolId: number): Observable<any> {
+    return this.http.get(`${baserUrl}${API_ENDPOINTS.usuarios.obtenerPorId}/${usuarioRolId}`);
+  }
+
   actualizarUsuario(id: number, usuarioActualizado: any): Observable<any> {
-    const url = `${baserUrl}/usuarios/${id}`;
-    return this.http.put<any>(url, usuarioActualizado);
+    if (!UsuarioValidator.esUsuarioValido(usuarioActualizado)) {
+      throw new Error('Datos de usuario inválidos');
+    }
+    return this.http.put(`${baserUrl}${API_ENDPOINTS.usuarios.actualizar}/${id}`, usuarioActualizado);
   }
-   añadirUsuario(user:any){
-      return this.http.post(`${baserUrl}/usuarios/guardar-admin`,user);
-    }
-   añadirNormal(user:any){
-      return this.http.post(`${baserUrl}/usuarios/guardar-normal`,user);
-    }
 }

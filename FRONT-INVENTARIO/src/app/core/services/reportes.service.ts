@@ -1,44 +1,52 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import baserUrl from '../models/helper';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import baserUrl from 'src/app/core/models/helper';
+import { API_ENDPOINTS } from 'src/app/core/constants/api-endpoints';
+import { ReportesValidator } from 'src/app/core/validator/reportes.validator';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReportesService {
+  constructor(private http: HttpClient) {}
 
-  constructor(private http: HttpClient) { }
+  /** ========================
+   *  DESCARGAR REPORTES PDF
+   * ======================== */
 
   descargarSalida(): Observable<Blob> {
-    const url = `${baserUrl}/pdf/generar-salidas`; // Reemplaza con la ruta correcta a tu endpoint de PDF
-
-    return this.http.get(url, { responseType: 'blob' });
+    return this.descargarReporte(API_ENDPOINTS.reportes.salidas);
   }
 
   descargarEntrada(): Observable<Blob> {
-    const url = `${baserUrl}/pdf/generar-entradas`; // Reemplaza con la ruta correcta a tu endpoint de PDF
-
-    return this.http.get(url, { responseType: 'blob' });
+    return this.descargarReporte(API_ENDPOINTS.reportes.entradas);
   }
+
   descargarProveedor(): Observable<Blob> {
-    const url = `${baserUrl}/pdf/generar-proveedor`; // Reemplaza con la ruta correcta a tu endpoint de PDF
-
-    return this.http.get(url, { responseType: 'blob' });
+    return this.descargarReporte(API_ENDPOINTS.reportes.proveedores);
   }
+
   descargarProducto(): Observable<Blob> {
-    const url = `${baserUrl}/pdf/generar-productos`; // Reemplaza con la ruta correcta a tu endpoint de PDF
-
-    return this.http.get(url, { responseType: 'blob' });
+    return this.descargarReporte(API_ENDPOINTS.reportes.productos);
   }
+
   descargarUsuarioAdmin(): Observable<Blob> {
-    const url = `${baserUrl}/pdf/generar-administrador`; // Reemplaza con la ruta correcta a tu endpoint de PDF
-
-    return this.http.get(url, { responseType: 'blob' });
+    return this.descargarReporte(API_ENDPOINTS.reportes.usuariosAdmin);
   }
-  descargarUsuarioOperador(): Observable<Blob> {
-    const url = `${baserUrl}/pdf/generar-operador`; // Reemplaza con la ruta correcta a tu endpoint de PDF
 
+  descargarUsuarioOperador(): Observable<Blob> {
+    return this.descargarReporte(API_ENDPOINTS.reportes.usuariosOperador);
+  }
+
+  /** ========================
+   *  MÉTODO REUTILIZABLE
+   * ======================== */
+  private descargarReporte(endpoint: string): Observable<Blob> {
+    if (!ReportesValidator.esRutaValida(endpoint)) {
+      throw new Error('Ruta de reporte inválida');
+    }
+    const url = `${baserUrl}${endpoint}`;
     return this.http.get(url, { responseType: 'blob' });
   }
 }

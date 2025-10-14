@@ -1,35 +1,55 @@
 import { Injectable } from '@angular/core';
-import baserUrl from '../models/helper';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import baserUrl from 'src/app/core/models/helper';
+import { API_ENDPOINTS } from 'src/app/core/constants/api-endpoints';
+import { ReclamoValidator } from 'src/app/core/validator/reclamo.validator';
+
 @Injectable({
   providedIn: 'root'
 })
 export class ReclamoService {
+  constructor(private http: HttpClient) {}
 
-  constructor(private http: HttpClient) { }
-
-  //listar marcas activadas
-  public listarReclamoActivadas(): Observable<any[]> {
-    return this.http.get<any[]>(`${baserUrl}/reclamo/activadas`);
+  /** ========================
+   *  LISTAR RECLAMOS ACTIVOS
+   * ======================== */
+  listarReclamosActivos(): Observable<any[]> {
+    return this.http.get<any[]>(`${baserUrl}${API_ENDPOINTS.reclamos.activados}`);
   }
 
-  // listar marcas desactivadas
-  public listarReclamoDesactivadas(): Observable<any[]> {
-    return this.http.get<any[]>(`${baserUrl}/reclamo/desactivadas`);
+  /** ========================
+   *  LISTAR RECLAMOS DESACTIVADOS
+   * ======================== */
+  listarReclamosDesactivados(): Observable<any[]> {
+    return this.http.get<any[]>(`${baserUrl}${API_ENDPOINTS.reclamos.desactivados}`);
   }
 
-  public agregarReclamo(reclamo: any) {
-    return this.http.post(`${baserUrl}/reclamo/`, reclamo);
+  /** ========================
+   *  AGREGAR NUEVO RECLAMO
+   * ======================== */
+  agregarReclamo(reclamo: any): Observable<any> {
+    if (!ReclamoValidator.esReclamoValido(reclamo)) {
+      throw new Error('Datos de reclamo inválidos');
+    }
+    return this.http.post(`${baserUrl}${API_ENDPOINTS.reclamos.base}`, reclamo);
   }
 
-  //listar por id
-  public obtenerReclamoPorId(reclamoId: any): Observable<any> {
-    return this.http.get(`${baserUrl}/reclamo/${reclamoId}`);
+  /** ========================
+   *  OBTENER RECLAMO POR ID
+   * ======================== */
+  obtenerReclamoPorId(reclamoId: number): Observable<any> {
+    return this.http.get(`${baserUrl}${API_ENDPOINTS.reclamos.base}/${reclamoId}`);
   }
 
-  public enviarDisculpas(reclamoId: any, mensaje: string): Observable<string> {
-    const url = `${baserUrl}/reclamo/${reclamoId}/enviar-disculpas`;
+  /** ========================
+   *  ENVIAR DISCULPAS
+   * ======================== */
+  enviarDisculpas(reclamoId: number, mensaje: string): Observable<string> {
+    if (!ReclamoValidator.esMensajeValido(mensaje)) {
+      throw new Error('El mensaje de disculpas no es válido');
+    }
+    const url = `${baserUrl}${API_ENDPOINTS.reclamos.enviarDisculpas}/${reclamoId}`;
     return this.http.post<string>(url, mensaje);
   }
 }

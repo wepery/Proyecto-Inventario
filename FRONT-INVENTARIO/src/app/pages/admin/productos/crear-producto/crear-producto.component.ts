@@ -1,9 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import Swal from 'sweetalert2';
+import Swal, { SweetAlertIcon } from 'sweetalert2';
 import { ProductoService } from 'src/app/core/services/producto.service';
 import { ProveedorService } from 'src/app/core/services/proveedor.service';
+
+interface Proveedor {
+  proveedorId: number;
+  nombre?: string;
+}
+
+const ALERT_MESSAGES = {
+  missingFields: { icon: 'error' as SweetAlertIcon, title: 'Faltan datos', text: 'Complete los campos.' },
+  saveSuccess: { icon: 'success' as SweetAlertIcon, title: 'Producto guardado', text: 'Se registró correctamente.' },
+  saveError: { icon: 'error' as SweetAlertIcon, title: 'Error', text: 'No se pudo registrar.' },
+  updateSuccess: { icon: 'success' as SweetAlertIcon, title: 'Producto actualizado', text: 'Se actualizó correctamente.' },
+  updateError: { icon: 'error' as SweetAlertIcon, title: 'Error', text: 'No se pudo actualizar.' }
+};
+
 
 @Component({
   selector: 'app-crear-producto',
@@ -13,16 +27,21 @@ import { ProveedorService } from 'src/app/core/services/proveedor.service';
 export class CrearProductoComponent implements OnInit {
 
   productoForm!: FormGroup;
-  proveedores: any[] = [];
+  proveedores: Proveedor[] = [];
 
   constructor(
-    private fb: FormBuilder,
-    private productoService: ProductoService,
-    private proveedorService: ProveedorService,
-    private router: Router
-  ) { }
+    private readonly fb: FormBuilder,
+    private readonly productoService: ProductoService,
+    private readonly proveedorService: ProveedorService,
+    private readonly router: Router
+  ) {}
 
   ngOnInit(): void {
+    this.inicializarFormulario();
+    this.obtenerProveedores();
+  }
+
+  private inicializarFormulario(): void {
     this.productoForm = this.fb.group({
       nombre: ['', Validators.required],
       descripcion: ['', Validators.required],
@@ -31,53 +50,35 @@ export class CrearProductoComponent implements OnInit {
       ubicacion: ['', Validators.required],
       proveedorId: ['', Validators.required]
     });
-
-    this.obtenerProveedor();
   }
 
   formSubmit(): void {
     if (this.productoForm.invalid) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Faltan datos',
-        text: 'Por favor, ingrese todos los atributos correctamente antes de guardar el producto.'
-      });
+      Swal.fire(ALERT_MESSAGES.missingFields);
       return;
     }
 
-    this.productoService.agregarProducto(
-      this.productoForm.value.nombre,
-      this.productoForm.value.precio,
-      this.productoForm.value.descripcion,
-      this.productoForm.value.stock,
-      this.productoForm.value.ubicacion,
-      this.productoForm.value.proveedorId
-    ).subscribe({
-      next: () => {
-        Swal.fire(
-          'Producto guardado',
-          'El producto se ha registrado correctamente',
-          'success'
-        );
-        this.productoForm.reset();
-        this.router.navigate(['/admin/producto']);
-      },
-      error: (error) => {
-        console.error(error);
-        Swal.fire(
-          'Error',
-          'Ocurrió un error al registrar el producto',
-          'error'
-        );
-      }
-    });
+    const { nombre, descripcion, precio, stock, ubicacion, proveedorId } = this.productoForm.value;
+
+    this.productoService.agregarProducto(nombre, precio, descripcion, stock, ubicacion, proveedorId)
+      .subscribe({
+        next: () => {
+          Swal.fire(ALERT_MESSAGES.saveSuccess).then(() => {
+            this.productoForm.reset();
+            this.router.navigate(['/admin/producto']);
+          });
+        },
+        error: (err) => {
+          console.error('Error al guardar producto:', err);
+          Swal.fire(ALERT_MESSAGES.saveError);
+        }
+      });
   }
 
-  obtenerProveedor(): void {
+  private obtenerProveedores(): void {
     this.proveedorService.listarProveedorActivadas().subscribe({
-      next: (data: any) => this.proveedores = data,
-      error: (error: any) => console.error('Error al obtener proveedores:', error)
+      next: (data: Proveedor[]) => this.proveedores = data,
+      error: (err) => console.error('Error al obtener proveedores:', err)
     });
   }
-
 }

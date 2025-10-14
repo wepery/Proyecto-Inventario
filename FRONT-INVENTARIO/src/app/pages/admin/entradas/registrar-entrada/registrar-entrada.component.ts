@@ -4,114 +4,136 @@ import { Router } from '@angular/router';
 import { EntradaService } from 'src/app/core/services/entrada.service';
 import { LoginService } from 'src/app/core/services/login.service';
 import { ProductoService } from 'src/app/core/services/producto.service';
-import swal from 'sweetalert2';
+import Swal from 'sweetalert2';
+
+// Mensajes constantes
+const ALERT_MESSAGES = {
+  fillFields: 'Complete todos los campos antes de agregar.',
+  noRecords: 'Agregue al menos un registro antes de enviar.',
+  sendSuccess: 'La entrada se ha enviado correctamente.',
+  sendError: 'Hubo un problema al enviar la entrada.',
+};
+
+interface Producto {
+  productoId: number;
+  nombre?: string;
+}
+
+interface Usuario {
+  id: number;
+  nombre?: string;
+}
+
+interface DetalleEntrada {
+  producto: { productoId: number };
+  descripcion: string;
+  cantidad: number;
+  usuario: { id: number };
+  entrada: { fechaEntrada: string };
+}
 
 @Component({
   selector: 'app-registrar-entrada',
   templateUrl: './registrar-entrada.component.html',
-  styleUrls: ['./registrar-entrada.component.css']
+  styleUrls: ['./registrar-entrada.component.css'],
 })
 export class RegistrarEntradaComponent implements OnInit {
-
   detalleEntradaForm!: FormGroup;
-  producto: any[] = [];
+  producto: Producto[] = [];
+  listaDetalleEntrada: DetalleEntrada[] = [];
   isLoggedIn = false;
-  user: any = null;
-  listaDetalleEntrada: any[] = [];
+  user: Usuario | null = null;
 
   constructor(
-    private fb: FormBuilder,
-    private productoService: ProductoService,
-    private login: LoginService,
-    private entradaService: EntradaService,
-    private router: Router
-  ) { }
+    private readonly fb: FormBuilder,
+    private readonly productoService: ProductoService,
+    private readonly loginService: LoginService,
+    private readonly entradaService: EntradaService,
+    private readonly router: Router
+  ) {}
 
   ngOnInit(): void {
-    // Inicializa el FormGroup
+    this.inicializarFormulario();
+    this.obtenerProductos();
+    this.obtenerUsuario();
+  }
+
+  private inicializarFormulario(): void {
     this.detalleEntradaForm = this.fb.group({
       productoId: ['', Validators.required],
       descripcion: ['', Validators.required],
       cantidad: [null, [Validators.required, Validators.min(1)]],
-      fechaEntrada: ['', Validators.required]
-    });
-
-    this.obtenerProducto();
-    this.obtenerUsuario();
-  }
-
-  // Obtiene los productos activos
-  obtenerProducto() {
-    this.productoService.listarProductoActivadas().subscribe(
-      (data: any) => this.producto = data,
-      (error: any) => console.error('Error al obtener productos:', error)
-    );
-  }
-
-  // Obtiene el usuario logueado
-  obtenerUsuario() {
-    this.isLoggedIn = this.login.isLoggedIn();
-    this.user = this.login.getUser();
-    this.login.loginStatusSubjec.asObservable().subscribe(() => {
-      this.isLoggedIn = this.login.isLoggedIn();
-      this.user = this.login.getUser();
+      fechaEntrada: ['', Validators.required],
     });
   }
 
-  // Agrega un detalle al listado
-  agregarProducto() {
+  private obtenerProductos(): void {
+    this.productoService.listarProductoActivadas().subscribe({
+      next: (data: Producto[]) => (this.producto = data),
+      error: (err) => console.error('Error al obtener productos:', err),
+    });
+  }
+
+  private obtenerUsuario(): void {
+    this.actualizarUsuario();
+    this.loginService.loginStatusSubjec.asObservable().subscribe(() => {
+      this.actualizarUsuario();
+    });
+  }
+
+  private actualizarUsuario(): void {
+    this.isLoggedIn = this.loginService.isLoggedIn();
+    this.user = this.loginService.getUser();
+  }
+
+  agregarProducto(): void {
     if (this.detalleEntradaForm.invalid) {
-      swal.fire('Error', 'Complete todos los campos antes de agregar.', 'error');
+      Swal.fire('Error', ALERT_MESSAGES.fillFields, 'error');
       return;
     }
 
-    const detalle = {
+    const detalle: DetalleEntrada = {
       producto: { productoId: this.detalleEntradaForm.value.productoId },
       descripcion: this.detalleEntradaForm.value.descripcion,
       cantidad: this.detalleEntradaForm.value.cantidad,
-      usuario: { id: this.user.id },
-      entrada: { fechaEntrada: this.detalleEntradaForm.value.fechaEntrada }
+      usuario: { id: this.user!.id },
+      entrada: { fechaEntrada: this.detalleEntradaForm.value.fechaEntrada },
     };
 
     this.listaDetalleEntrada.push(detalle);
     this.detalleEntradaForm.reset();
   }
 
-  // Envía todos los detalles al backend
-  enviarEntrada() {
+  enviarEntrada(): void {
     if (this.listaDetalleEntrada.length === 0) {
-      swal.fire('Error', 'Agregue al menos un registro antes de enviar.', 'error');
+      Swal.fire('Error', ALERT_MESSAGES.noRecords, 'error');
       return;
     }
 
-    // Asigna el usuario a todos los detalles
-    this.listaDetalleEntrada.forEach(d => d.usuario.id = this.user.id);
+    // Asegura que todos los detalles tengan el usuario
+    this.listaDetalleEntrada.forEach((d) => (d.usuario.id = this.user!.id));
 
-    this.entradaService.crearEntradaConDetalles(this.listaDetalleEntrada)
-      .subscribe({
-        next: () => {
-          swal.fire('Éxito', 'La entrada se ha enviado correctamente.', 'success');
-          this.listaDetalleEntrada = [];
-          this.detalleEntradaForm.reset();
-          this.router.navigate(['/admin/entradas']);
-        },
-        error: (err) => {
-          console.error(err);
-          swal.fire('Error', 'Hubo un problema al enviar la entrada.', 'error');
-        }
-      });
+    this.entradaService.crearEntradaConDetalles(this.listaDetalleEntrada).subscribe({
+      next: () => {
+        Swal.fire('Éxito', ALERT_MESSAGES.sendSuccess, 'success');
+        this.listaDetalleEntrada = [];
+        this.detalleEntradaForm.reset();
+        this.router.navigate(['/admin/entradas']);
+      },
+      error: (err) => {
+        console.error('Error al enviar entrada:', err);
+        Swal.fire('Error', ALERT_MESSAGES.sendError, 'error');
+      },
+    });
   }
 
-  // Validación de número positivo para cantidad
-  guardarValor(event: any) {
+  // Solo permite números positivos
+  guardarValor(event: Event): void {
     const input = event.target as HTMLInputElement;
-    let value = input.value.replace(/[^0-9]/g, '');
-    input.value = value;
+    input.value = input.value.replace(/[^0-9]/g, '');
   }
 
-  // Permite eliminar un detalle de la lista
-  eliminarDetalle(index: number) {
+  eliminarDetalle(index: number): void {
     this.listaDetalleEntrada.splice(index, 1);
   }
-
 }

